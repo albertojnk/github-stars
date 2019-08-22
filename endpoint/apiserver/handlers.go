@@ -1,6 +1,7 @@
 package apiserver
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -10,11 +11,9 @@ import (
 func Handlers() http.Handler {
 	router := mux.NewRouter()
 
-	{
-		handler := StarHandler{}
+	router.HandleFunc("/github", GetStarred).Methods("GET")
 
-		router.Handle("/github", handler.Get()).Methods("GET")
-	}
+	log.Fatal(http.ListenAndServe(":8000", router))
 
 	return router
 }

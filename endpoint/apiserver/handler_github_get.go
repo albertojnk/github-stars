@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -14,12 +15,11 @@ type StarHandlerRequest struct {
 
 // StarGithubResponse is the struct we will use to unmarshal the github response
 type StarGithubResponse struct {
-	Starred []Starred
+	Repository
 }
 
 // Starred is a type map the response and unmarshal
 type Starred struct {
-	Repo Repository `json:"repo"`
 }
 
 // Repository is a type map the response and unmarshal
@@ -31,40 +31,43 @@ type Repository struct {
 	Language    string `json:"language" bson:"language"`
 }
 
-// Get gets (duh) the repositories starred from github
-func (h StarHandler) Get() http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
+// GetStarred gets (duh) the starred repositories from github
+func GetStarred(rw http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			fmt.Println(fmt.Errorf("something went wrong, err: %s", err))
-			return
-		}
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("something went wrong, err: %s", err)
+	}
 
-		reqData := StarHandlerRequest{}
+	reqData := StarHandlerRequest{}
 
-		err = json.Unmarshal(body, &reqData)
-		if err != nil {
-			fmt.Println(fmt.Errorf("error while unmarshaling, err: %s", err))
-			return
-		}
+	err = json.Unmarshal(body, &reqData)
+	if err != nil {
+		log.Printf("error while unmarshaling, err: %s", err)
+	}
 
-		url := fmt.Sprintf("https://api.github.com/users/%s/starred", reqData.Username)
+	url := fmt.Sprintf("https://api.github.com/users/%s/starred", reqData.Username)
 
-		resp, err := http.Get(url)
-		if err != nil {
-			fmt.Println(fmt.Errorf("something went wrong, err: %s", err))
-			return
-		}
+	req, err := http.NewRequest("GET", url, nil)
+	req.Header.Set("Accept", "application/vnd.github.v3.star+json")
 
-		respData := StarGithubResponse{}
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Printf("something went wrong, err: %s", err)
+	}
 
-		err = json.NewDecoder(resp.Body).Decode(&respData)
-		if err != nil {
-			fmt.Println(fmt.Errorf("error while decoding, err: %s", err))
-			return
-		}
+	body, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("something went wrong, err: %s", err)
+	}
 
-	})
+	respData := []StarGithubResponse{}
+
+	err = json.Unmarshal(body, &respData)
+	if err != nil {
+		log.Printf("error while unmarshaling, err: %s", err)
+	}
+
+	json.NewEncoder(rw).Encode(respData)
 }
