@@ -11,7 +11,9 @@ import (
 func Handlers() http.Handler {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/github", CreateRepository).Methods("POST")
+	router.HandleFunc("/create", CreateRepository).Methods("POST")
+	router.HandleFunc("/list", ListRepositories).Methods("GET")
+	router.HandleFunc("/update", UpdateRepositoryTags).Methods("PATCH")
 
 	log.Fatal(http.ListenAndServe(":8090", router))
 

@@ -38,13 +38,15 @@ func CreateRepository(rw http.ResponseWriter, r *http.Request) {
 	respData := GetStarredRepositories(reqData.Username)
 
 	// Writing down the results on the database
-	db.C("repository").Upsert(
+	_, err = db.C("users").Upsert(
 		bson.M{"_id": reqData.Username},
 		bson.M{
 			"$set": bson.M{"repositories": respData},
 		},
 	)
-
+	if err != nil {
+		log.Printf("error creating repositories, err: %s", err)
+	}
 	// Encode the results and send back to requester
 	json.NewEncoder(rw).Encode(respData)
 }

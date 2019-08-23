@@ -8,9 +8,9 @@ import (
 	"net/http"
 )
 
-// StarGithubResponse is the struct we will use to unmarshal the github response
-type StarGithubResponse struct {
-	ID          int      `json:"id" bson:"_id"`
+// StarredRepositories is the struct we will use to unmarshal the github response
+type StarredRepositories struct {
+	ID          int      `json:"id" bson:"id"`
 	Name        string   `json:"name" bson:"name"`
 	Description string   `json:"description" bson:"description"`
 	URL         string   `json:"html_url" bson:"url"`
@@ -19,11 +19,12 @@ type StarGithubResponse struct {
 }
 
 // GetStarredRepositories gets (duh) the starred repositories from github
-func GetStarredRepositories(username string) []StarGithubResponse {
+func GetStarredRepositories(username string) []StarredRepositories {
 	// Setting up a http request to the github API
-	url := fmt.Sprintf("https://api.github.com/users/%s/starred", username)
+	url := fmt.Sprintf("https://api.github.com/users/%s/starred?per_page=200", username)
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Set("Accept", "application/vnd.github.v3.star+json")
+	req.Header.Set("Content-Type", "application/json")
 
 	// Making the request
 	resp, err := http.Get(url)
@@ -37,7 +38,7 @@ func GetStarredRepositories(username string) []StarGithubResponse {
 		log.Printf("something went wrong, err: %s", err)
 	}
 
-	respData := []StarGithubResponse{}
+	respData := []StarredRepositories{}
 
 	// Unmarshaling the results
 	err = json.Unmarshal(body, &respData)
