@@ -13,7 +13,7 @@ func Handlers() http.Handler {
 
 	router.HandleFunc("/github", GetStarred).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":8000", router))
+	log.Fatal(http.ListenAndServe(":8090", router))
 
 	return router
 }
