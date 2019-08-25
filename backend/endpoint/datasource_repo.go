@@ -3,6 +3,8 @@ package endpoint
 import (
 	"log"
 
+	"github.com/golang-crud-spa/backend/search"
+
 	"github.com/globalsign/mgo/bson"
 )
 
@@ -23,6 +25,18 @@ func CreateUserRepositories(username string, repositories []StarredRepositories)
 	}
 
 	log.Println("Repositories creation succeed")
+
+	index, err := search.NewBleveMapping(username)
+	if err != nil {
+		log.Printf("something wrong happend, err: %s", err)
+		return err
+	}
+
+	err = search.NewBleveIndex(index, repositories)
+	if err != nil {
+		log.Printf("something wrong happend, err: %s", err)
+		return err
+	}
 
 	return nil
 }

@@ -2,6 +2,9 @@ package main
 
 import (
 	"log"
+	"os"
+
+	"github.com/golang-crud-spa/backend/search"
 
 	"github.com/golang-crud-spa/backend/endpoint"
 
@@ -11,8 +14,7 @@ import (
 var client *mongo.Client
 
 func main() {
+	defer os.RemoveAll(search.SearchDIR)
 	log.Println("Starting the application...")
-
 	endpoint.Handlers()
-
 }

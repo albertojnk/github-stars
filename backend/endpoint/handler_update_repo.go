@@ -34,8 +34,10 @@ func UpdateRepositoryTags(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	tags := removeDuplicates(reqData.Tags)
+
 	// update tags on DB
-	user, err := UpdateUserRepositoryTags(reqData.Username, reqData.RepositoryID, reqData.Tags)
+	user, err := UpdateUserRepositoryTags(reqData.Username, reqData.RepositoryID, tags)
 	if err != nil {
 		log.Printf("error finding repository, err: %s", err)
 		return
@@ -44,4 +46,20 @@ func UpdateRepositoryTags(rw http.ResponseWriter, r *http.Request) {
 	// Encode response into json
 	rw.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(rw).Encode(user.Repositories)
+}
+
+// removeDuplicates will remove all duplicates from a given string slice
+func removeDuplicates(tags []string) []string {
+	tagsMap := make(map[string]interface{})
+	results := make([]string, 0)
+
+	for _, tag := range tags {
+		tagsMap[tag] = nil
+	}
+
+	for key := range tagsMap {
+		results = append(results, key)
+	}
+
+	return results
 }

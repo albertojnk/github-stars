@@ -37,7 +37,12 @@ func CreateRepository(rw http.ResponseWriter, r *http.Request) {
 		log.Printf("error while creating, err: %s", err)
 	}
 
+	user, err := ListUserRepositories(reqData.Username)
+	if err != nil {
+		log.Printf("error while listing, err: %s", err)
+	}
+
 	// Encode response into json
 	rw.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(rw).Encode(respData)
+	json.NewEncoder(rw).Encode(user)
 }

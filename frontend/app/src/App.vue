@@ -1,8 +1,12 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link to="/">
+        <header>
+          <p>githubstarts</p>
+        </header>
+      </router-link>
+      <!-- <router-link to="/about">About</router-link>  -->
     </div>
     <router-view />
   </div>
@@ -27,5 +31,12 @@
 
 #nav a.router-link-exact-active {
   color: #42b983;
+}
+
+header p {
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  text-align: left;
+  font-weight: bolder;
+  font-size: larger;
 }
 </style>
