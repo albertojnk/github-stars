@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"log"
+	"strings"
 
 	"github.com/golang-crud-spa/backend/search"
 
@@ -13,13 +14,10 @@ func CreateUserRepositories(username string, repositories []StarredRepositories)
 	db := Connect()
 
 	// Writing down the results on the database
-	_, err := db.C("users").Upsert(
-		bson.M{"_id": username},
-		bson.M{
-			"$set": bson.M{"repositories": repositories},
-		},
+	err := db.C("users").Insert(
+		bson.M{"_id": username, "repositories": repositories},
 	)
-	if err != nil {
+	if err != nil && !strings.Contains(err.Error(), "dup key") {
 		log.Printf("error creating repositories, err: %s", err)
 		return err
 	}

@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <div v-if="loading == false && loaded == true">
+    <div class="container">
       <p>
         https://github.com/
         <input
@@ -19,20 +19,6 @@
         </button>
       </div>
     </div>
-
-    <div class="loading-div" v-if="loading == true && loaded == false">
-      <div id="noTrespassingOuterBarG">
-        <div id="noTrespassingFrontBarG" class="noTrespassingAnimationG">
-          <div class="noTrespassingBarLineG"></div>
-          <div class="noTrespassingBarLineG"></div>
-          <div class="noTrespassingBarLineG"></div>
-          <div class="noTrespassingBarLineG"></div>
-          <div class="noTrespassingBarLineG"></div>
-          <div class="noTrespassingBarLineG"></div>
-        </div>
-      </div>
-      <p>Getting the repositories list from Github...</p>
-    </div>
   </div>
 </template>
 
@@ -49,37 +35,33 @@ export default {
         repositories: null
       },
       username: "",
-      APIURL: "http://localhost:8090",
-      loading: false,
-      loaded: true
+      APIURL: "http://localhost:8090"
     };
   },
   methods: {
-    ...mapMutations(["setNewUser"]),
+    ...mapMutations(["setNewUser", "setLoading", "setLoaded"]),
     submit: function() {
+      this.setLoading({ loading: true, loaded: false });
       this.$http
         .post(this.APIURL + "/create", {
           username: this.username
         })
         .then(resp => {
-          this.loading = true;
-          this.loaded = false;
           this.response = {
             id: resp.data[0]._id,
             repositories: resp.data[0].repositories
           };
           this.setNewUser(this.response);
+
           // the test requested to set on localstorage but I doubt it is necessary ?
           localStorage.setItem("user", JSON.stringify(this.response));
+
+          this.setLoaded({ loading: false, loaded: true });
         })
         .catch(err => {
           console.log(err);
         })
-        .finally(
-          (this.loaded = true),
-          (this.loading = false),
-          this.$router.push("list")
-        );
+        .finally(this.$router.push("list"));
     }
   }
 };
@@ -122,101 +104,8 @@ export default {
   cursor: pointer;
   outline: none;
 }
-
-#noTrespassingOuterBarG {
-  height: 19px;
-  width: 156px;
-  border: 1px solid rgb(0, 0, 0);
-  overflow: hidden;
-  background-color: rgb(255, 255, 255);
-  margin: auto;
-}
-
-.noTrespassingBarLineG {
-  background-color: rgb(0, 0, 0);
-  float: left;
-  width: 14px;
-  height: 117px;
-  margin-right: 23px;
-  margin-top: -27px;
-  transform: rotate(45deg);
-  -o-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  -webkit-transform: rotate(45deg);
-  -moz-transform: rotate(45deg);
-}
-
-.noTrespassingAnimationG {
-  width: 230px;
-  animation-name: noTrespassingAnimationG;
-  -o-animation-name: noTrespassingAnimationG;
-  -ms-animation-name: noTrespassingAnimationG;
-  -webkit-animation-name: noTrespassingAnimationG;
-  -moz-animation-name: noTrespassingAnimationG;
-  animation-duration: 0.515s;
-  -o-animation-duration: 0.515s;
-  -ms-animation-duration: 0.515s;
-  -webkit-animation-duration: 0.515s;
-  -moz-animation-duration: 0.515s;
-  animation-iteration-count: infinite;
-  -o-animation-iteration-count: infinite;
-  -ms-animation-iteration-count: infinite;
-  -webkit-animation-iteration-count: infinite;
-  -moz-animation-iteration-count: infinite;
-  animation-timing-function: linear;
-  -o-animation-timing-function: linear;
-  -ms-animation-timing-function: linear;
-  -webkit-animation-timing-function: linear;
-  -moz-animation-timing-function: linear;
-}
-
-@keyframes noTrespassingAnimationG {
-  0% {
-    margin-left: 0px;
-  }
-
-  100% {
-    margin-left: -37px;
-  }
-}
-
-@-o-keyframes noTrespassingAnimationG {
-  0% {
-    margin-left: 0px;
-  }
-
-  100% {
-    margin-left: -37px;
-  }
-}
-
-@-ms-keyframes noTrespassingAnimationG {
-  0% {
-    margin-left: 0px;
-  }
-
-  100% {
-    margin-left: -37px;
-  }
-}
-
-@-webkit-keyframes noTrespassingAnimationG {
-  0% {
-    margin-left: 0px;
-  }
-
-  100% {
-    margin-left: -37px;
-  }
-}
-
-@-moz-keyframes noTrespassingAnimationG {
-  0% {
-    margin-left: 0px;
-  }
-
-  100% {
-    margin-left: -37px;
-  }
+.container {
+  height: 100%;
+  margin: 10% auto auto auto;
 }
 </style>
