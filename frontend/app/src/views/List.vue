@@ -16,56 +16,90 @@
       </div>
       <p>Getting the repositories list from Github...</p>
     </div>
-    <div class="lighter">
-      <span class="searchContainer">
-        <input type="search" class="search" placeholder="search by tag" />
-      </span>
-    </div>
-    <table
-      class="table-repositories"
+    <div
+      class="listContainer"
       v-if="this.loading == false && this.loaded == true"
     >
-      <thead>
-        <tr class="tableHeader">
-          <th>Repository</th>
-          <th>Description</th>
-          <th>Language</th>
-          <th>Tags</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody class="tableBody">
-        <tr v-for="(repository, index) in repositories" v-bind:key="index">
-          <td class="repository-name">{{ repository.name }}</td>
-          <td class="repository-description">{{ repository.description }}</td>
-          <td class="repository-language">{{ repository.language }}</td>
-          <td class="repository-tags">
-            <template v-for="(tag, idx) in repository.tags">
-              {{ tag | tagNormalize(idx, repository.tags.length) }}
-            </template>
-          </td>
-          <td class="repository-edit">
-            <edit-modal />
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <div class="lighter">
+        <span class="searchContainer">
+          <input type="search" class="search" placeholder="search by tag" />
+        </span>
+      </div>
+      <table class="table-repositories">
+        <thead>
+          <tr class="tableHeader">
+            <th>Repository</th>
+            <th>Description</th>
+            <th>Language</th>
+            <th>Tags</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody class="tableBody">
+          <tr v-for="(repository, index) in repositories" v-bind:key="index">
+            <td class="repository-name">{{ repository.name }}</td>
+            <td class="repository-description">{{ repository.description }}</td>
+            <td class="repository-language">{{ repository.language }}</td>
+            <td class="repository-tags">
+              <template v-for="(tag, idx) in repository.tags">
+                {{ tag | tagNormalize(idx, repository.tags.length) }}
+              </template>
+            </td>
+            <td class="repository-edit">
+              <a href="javascript:void(0)" @click="show(repository)">edit</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div v-if="modal" v-bind:class="{ 'edit-modal': modal }">
+      <div class="content">
+        <p>edit tags for {{ currentRepo.name }}</p>
+        <input type="text" name="tags" id="tags" v-bind:value="currentTags" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
-import EditModal from "../components/Edit.vue";
 
 export default {
   name: "list",
-  components: {
-    EditModal
+  components: {},
+  data() {
+    return {
+      modal: false,
+      currentRepo: null,
+      currentTags: null
+    };
   },
   computed: {
     ...mapState(["id", "repositories", "loading", "loaded"])
   },
-  methods: {},
+  methods: {
+    show(repository) {
+      this.modal = true;
+      this.currentRepo = repository;
+      this.currentTags = this.currentTagsNormalizer(repository.tags);
+    },
+    hide() {
+      this.modal = false;
+    },
+    currentTagsNormalizer(tags) {
+      var len = tags.length;
+      var results = "";
+      if (len == 0) {
+        return "";
+      }
+      tags.forEach(tag => {
+        results += tag + ", ";
+      });
+
+      return results;
+    }
+  },
   filters: {
     tagNormalize(tag, index, len) {
       if (index == len - 1) {
@@ -228,4 +262,48 @@ tr:nth-child(odd) {
   float: left;
   margin: 5% auto auto 5%;
 }
+.edit-modal {
+  width: 400px;
+  height: 200px;
+  background-color: green;
+  margin: 0 auto;
+  position: absolute;
+  z-index: 1;
+  top: calc(50% - 200px / 2);
+  left: calc(50% - 400px / 2);
+}
+
+.edit-modal:before {
+  background: rgba(189, 195, 199, 0.6);
+  content: "";
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.content {
+  background: yellow;
+  height: 100%;
+  width: 100%;
+}
+
+/* .bg-modal-active {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: rgba(189, 195, 199, 0.6);
+} */
+
+/* .listContainer{
+  z-index: -2;
+} */
+/* body.app {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: rgba(189, 195, 199, 0.6);  
+} */
 </style>

@@ -11,14 +11,7 @@
 export default {
   name: "edit-modal",
   components: {},
-  methods: {
-    show() {
-      this.$modal.show("edit-modal");
-    },
-    hide() {
-      this.$modal.hide("edit-modal");
-    }
-  }
+  methods: {}
 };
 </script>
 
