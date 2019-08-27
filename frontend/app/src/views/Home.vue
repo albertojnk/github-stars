@@ -9,11 +9,12 @@
           class="usernameTxt"
           placeholder=" username"
           v-model="username"
+          @keypress="sendMonitor"
         />
       </p>
 
       <div class="wrap">
-        <button class="button" v-on:click="submit(username)">
+        <button class="button" @click="submit()">
           get repositories
           <span class="arrow-right"></span>
         </button>
@@ -40,7 +41,12 @@ export default {
   },
   methods: {
     ...mapMutations(["setNewUser", "setLoading", "setLoaded"]),
-    submit: function() {
+    sendMonitor(event) {
+      if (event.key == "Enter") {
+        this.submit();
+      }
+    },
+    submit() {
       this.setLoading({ loading: true, loaded: false });
       this.$http
         .post(this.APIURL + "/create", {
@@ -60,6 +66,7 @@ export default {
         })
         .catch(err => {
           console.log(err);
+          this.$router.push("/");
         })
         .finally(this.$router.push("list"));
     }

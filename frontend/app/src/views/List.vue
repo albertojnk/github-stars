@@ -22,7 +22,12 @@
     >
       <div class="lighter">
         <span class="searchContainer">
-          <input type="search" class="search" placeholder="search by tag" />
+          <input
+            type="search"
+            class="search"
+            placeholder="search by tag"
+            v-bind:value="searchValue"
+          />
         </span>
       </div>
       <table class="table-repositories">
@@ -37,7 +42,11 @@
         </thead>
         <tbody class="tableBody">
           <tr v-for="(repository, index) in repositories" v-bind:key="index">
-            <td class="repository-name">{{ repository.name }}</td>
+            <td class="repository-name">
+              <a v-bind:href="repository.html_url" target="_blank">
+                {{ repository.name }}
+              </a>
+            </td>
             <td class="repository-description">{{ repository.description }}</td>
             <td class="repository-language">{{ repository.language }}</td>
             <td class="repository-tags">
@@ -46,7 +55,13 @@
               </template>
             </td>
             <td class="repository-edit">
-              <a href="javascript:void(0)" @click="show(repository)">edit</a>
+              <a
+                href="javascript:void(0)"
+                class="edit-tags"
+                @click="show(repository)"
+              >
+                edit
+              </a>
             </td>
           </tr>
         </tbody>
@@ -54,31 +69,100 @@
     </div>
 
     <div v-if="modal" v-bind:class="{ 'edit-modal': modal }">
-      <div class="content">
-        <p>edit tags for {{ currentRepo.name }}</p>
-        <input type="text" name="tags" id="tags" v-bind:value="currentTags" />
+      <div class="content" v-click-outside="outsideClose">
+        <div class="text-input-wrapper">
+          <p class="content-p">edit tags for {{ currentRepo.name }}</p>
+          <input
+            type="text"
+            name="tags"
+            id="tags"
+            v-model="currentTags"
+            @keypress="sendMonitor"
+          />
+        </div>
+        <div class="btnWrapper">
+          <button class="btn" id="btn-submit" type="submit" @click="Save">
+            save
+          </button>
+          <button class="btn" id="btn-close" type="button" @click="Close">
+            close
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "list",
   components: {},
   data() {
     return {
+      APIURL: "http://localhost:8090",
       modal: false,
       currentRepo: null,
-      currentTags: null
+      currentTags: null,
+      searchValue: null,
+      response: null
     };
   },
   computed: {
-    ...mapState(["id", "repositories", "loading", "loaded"])
+    ...mapState(["id", "repositories", "loading", "loaded"]),
   },
   methods: {
+    ...mapMutations(["setNewUser", "setLoading", "setLoaded"]),
+    Save() {
+      this.$http
+        .patch(this.APIURL + "/update", {
+          username: this.id,
+          repo_id: this.currentRepo.id,
+          tags: this.transformInArray(this.currentTags)
+        })
+        .then(resp => {
+          this.response = {
+            id: this.id,
+            repositories: resp.data
+          };
+
+          this.modal = false;
+          this.setNewUser(this.response);
+
+          // the test requested to set on localstorage but I doubt it is necessary ?
+          localStorage.setItem("user", JSON.stringify(this.response));
+          this.setLoaded({ loading: false, loaded: true });
+        })
+        .catch(err => {
+          console.log(err);
+          this.$router.push("/");
+        })
+        .finally(this.$router.push("list"));
+    },
+    sendMonitor(event) {
+      if (event.key == "Enter") {
+        this.Save();
+      }
+    },
+    transformInArray(value) {
+      var splited = value.split(",");
+      var result = [];
+      splited.forEach(tag => {
+        if (tag.trim() !== ""){
+          result.push(tag.trim());
+        };
+      });
+      return result;
+    },
+    outsideClose(event) {
+      if (event.target.className !== "edit-tags" || event.key === "Escape") {
+        this.modal = false;
+      }
+    },
+    Close() {
+      this.modal = false;
+    },
     show(repository) {
       this.modal = true;
       this.currentRepo = repository;
@@ -264,17 +348,16 @@ tr:nth-child(odd) {
 }
 .edit-modal {
   width: 400px;
-  height: 200px;
-  background-color: green;
+  height: 120px;
   margin: 0 auto;
   position: absolute;
   z-index: 1;
-  top: calc(50% - 200px / 2);
+  top: calc(50% - 120px / 2);
   left: calc(50% - 400px / 2);
 }
 
 .edit-modal:before {
-  background: rgba(189, 195, 199, 0.6);
+  background: rgba(124, 127, 129, 0.7);
   content: "";
   width: 100%;
   height: 100%;
@@ -285,25 +368,62 @@ tr:nth-child(odd) {
 }
 
 .content {
-  background: yellow;
   height: 100%;
+  width: 100%;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  background: white;
+  border-radius: 10px;
+}
+
+.text-input-wrapper {
+  height: 65%;
   width: 100%;
 }
 
-/* .bg-modal-active {
-  position: absolute;
-  height: 100%;
+.content-p {
   width: 100%;
-  background: rgba(189, 195, 199, 0.6);
-} */
+  margin: auto auto 1% 7%;
+  text-align: left;
+  padding-top: 10px;
+}
 
-/* .listContainer{
-  z-index: -2;
-} */
-/* body.app {
-  position: absolute;
-  height: 100%;
+#tags {
+  width: 90%;
+  border: solid 2px #000000;
+}
+
+.btnWrapper {
+  height: 35%;
   width: 100%;
-  background: rgba(189, 195, 199, 0.6);  
-} */
+  align-items: center;
+  justify-content: center;
+}
+.btn {
+  width: 80px;
+  height: 25px;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-size: 14px;
+  text-transform: lowercase;
+  font-weight: bolder;
+  color: #000;
+  background-color: #fff;
+  border: 2px solid #000000;
+  border-radius: 0px;
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 1);
+  cursor: pointer;
+  outline: none;
+  line-height: 0.5 !important;
+}
+
+[type="submit"]:not(:disabled):hover {
+  cursor: pointer;
+  background: lightblue;
+}
+
+[type="button"]:not(:disabled):hover {
+  cursor: pointer;
+  background: lightgray;
+}
 </style>
