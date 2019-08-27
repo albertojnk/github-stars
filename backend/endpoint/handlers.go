@@ -19,6 +19,7 @@ func Handlers() http.Handler {
 	router.HandleFunc("/create", CreateRepository).Methods("POST")
 	router.HandleFunc("/list", ListRepositories).Methods("GET")
 	router.HandleFunc("/update", UpdateRepositoryTags).Methods("PATCH")
+	router.HandleFunc("/search", HandleSearch).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8090", handlers.CORS(origins, methods, headers)(router)))
 

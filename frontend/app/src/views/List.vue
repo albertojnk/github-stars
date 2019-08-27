@@ -26,7 +26,8 @@
             type="search"
             class="search"
             placeholder="search by tag"
-            v-bind:value="searchValue"
+            v-model="searchValue"
+            @keypress="searchRepository"
           />
         </span>
       </div>
@@ -109,12 +110,46 @@ export default {
       response: null
     };
   },
+  mounted() {
+    if (this.id == undefined) {
+      this.setLoading({ loading: true, loaded: false });
+      let user = JSON.parse(localStorage.getItem("user"));
+      this.$http
+        .get(this.APIURL + "/list?username=" + user.id)
+        .then(resp => {
+          this.response = {
+            id: resp.data[0]._id,
+            repositories: resp.data[0].repositories
+          };
+          this.setNewUser(this.response);
+          localStorage.setItem("user", JSON.stringify(this.response));
+          this.setLoaded({ loading: false, loaded: true });
+        })
+        .catch(err => {
+          console.log(err);
+          this.$router.push("/");
+        });
+    }
+  },
   computed: {
-    ...mapState(["id", "repositories", "loading", "loaded"]),
+    ...mapState(["id", "repositories", "loading", "loaded"])
   },
   methods: {
     ...mapMutations(["setNewUser", "setLoading", "setLoaded"]),
+    searchRepository(event) {
+      if (event.key == "Enter") {
+        this.$http
+          .post(this.APIURL + "/search", {
+            id: this.id,
+            value: this.searchValue
+          })
+          .then(resp => {
+            console.log(resp);
+          });
+      }
+    },
     Save() {
+      this.setLoading({ loading: true, loaded: false });
       this.$http
         .patch(this.APIURL + "/update", {
           username: this.id,
@@ -129,8 +164,6 @@ export default {
 
           this.modal = false;
           this.setNewUser(this.response);
-
-          // the test requested to set on localstorage but I doubt it is necessary ?
           localStorage.setItem("user", JSON.stringify(this.response));
           this.setLoaded({ loading: false, loaded: true });
         })
@@ -149,9 +182,9 @@ export default {
       var splited = value.split(",");
       var result = [];
       splited.forEach(tag => {
-        if (tag.trim() !== ""){
+        if (tag.trim() !== "") {
           result.push(tag.trim());
-        };
+        }
       });
       return result;
     },
@@ -409,8 +442,8 @@ tr:nth-child(odd) {
   font-weight: bolder;
   color: #000;
   background-color: #fff;
-  border: 2px solid #000000;
-  border-radius: 0px;
+  border: 2px solid #000000 !important;
+  border-radius: 0px !important;
   box-shadow: 3px 3px 0px rgba(0, 0, 0, 1);
   cursor: pointer;
   outline: none;

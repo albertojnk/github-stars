@@ -79,6 +79,19 @@ func UpdateUserRepositoryTags(username string, repositoryID int, tags []string) 
 		return User{}, err
 	}
 
+	search.RemoveExistingMap(username)
+	index, err := search.NewBleveMapping(username)
+	if err != nil {
+		log.Printf("something wrong happend, err: %s", err)
+		return User{}, err
+	}
+
+	err = search.NewBleveIndex(index, user.Repositories)
+	if err != nil {
+		log.Printf("something wrong happend, err: %s", err)
+		return User{}, err
+	}
+
 	return user, nil
 }
 

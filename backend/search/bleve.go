@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/davecgh/go-spew/spew"
+
 	"github.com/blevesearch/bleve"
 )
 
@@ -43,6 +45,7 @@ func NewBleveIndex(index bleve.Index, data interface{}) error {
 
 // RemoveExistingMap removes an existing index map
 func RemoveExistingMap(path string) error {
+	spew.Dump("teste")
 	return os.RemoveAll(SearchDIR + path)
 }
 
@@ -55,3 +58,42 @@ func RemoveExistingMap(path string) error {
 // 	return nil, err
 // }
 // return searchResults, nil
+
+func GetBleveDocsFromSearchResults(results *bleve.SearchResult, index bleve.Index) []map[string]string {
+	docs := make([]map[string]string, 0)
+
+	for _, val := range results.Hits {
+		id := val.ID
+		doc, _ := index.Document(id)
+
+		rv := struct {
+			ID     string            `json:"id"`
+			Fields map[string]string `json:"fields"`
+		}{
+			ID:     id,
+			Fields: map[string]string{},
+		}
+		for _, field := range doc.Fields {
+			var newval string
+			newval = string(field.Value())
+			rv.Fields[field.Name()] = newval
+		}
+		docs = append(docs, rv.Fields)
+	}
+
+	return docs
+}
+
+func GetOriginalDocsFromSearchResults(results *bleve.SearchResult, index bleve.Index) [][]byte {
+	docs := make([][]byte, 0)
+
+	for _, val := range results.Hits {
+		id := val.ID
+		raw, err := index.GetInternal([]byte(id))
+		if err != nil {
+			log.Fatal("Trouble getting internal doc:", err)
+		}
+		docs = append(docs, raw)
+	}
+	return docs
+}
