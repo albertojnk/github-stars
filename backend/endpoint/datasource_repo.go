@@ -4,8 +4,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/golang-crud-spa/backend/search"
-
 	"github.com/globalsign/mgo/bson"
 )
 
@@ -23,18 +21,6 @@ func CreateUserRepositories(username string, repositories []StarredRepositories)
 	}
 
 	log.Println("Repositories creation succeed")
-
-	index, err := search.NewBleveMapping(username)
-	if err != nil {
-		log.Printf("something wrong happend, err: %s", err)
-		return err
-	}
-
-	err = search.NewBleveIndex(index, repositories)
-	if err != nil {
-		log.Printf("something wrong happend, err: %s", err)
-		return err
-	}
 
 	return nil
 }
@@ -76,19 +62,6 @@ func UpdateUserRepositoryTags(username string, repositoryID int, tags []string) 
 	err = db.C("users").Find(bson.M{"_id": username}).One(&user)
 	if err != nil {
 		log.Printf("error finding repository, err: %s", err)
-		return User{}, err
-	}
-
-	search.RemoveExistingMap(username)
-	index, err := search.NewBleveMapping(username)
-	if err != nil {
-		log.Printf("something wrong happend, err: %s", err)
-		return User{}, err
-	}
-
-	err = search.NewBleveIndex(index, user.Repositories)
-	if err != nil {
-		log.Printf("something wrong happend, err: %s", err)
 		return User{}, err
 	}
 
