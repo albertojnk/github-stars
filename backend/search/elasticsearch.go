@@ -6,15 +6,14 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strconv"
 
-	"github.com/davecgh/go-spew/spew"
-	"gopkg.in/olivere/elastic.v5"
+	elastic "github.com/olivere/elastic/v7"
 )
 
 // IndexBody is the body template for indexing ...
 type IndexBody struct {
-	ID           string `json:"id"`
-	Repositories []model.Repository
+	Repository model.Repository `json:"repository"`
 }
 
 // CreateIndex ...
@@ -28,15 +27,8 @@ func CreateIndex(index string, data model.User) error {
 		return err
 	}
 
-	// check if index exists
-	exists, err := client.IndexExists(index).Do(context.Background())
-	if err != nil {
-		log.Printf("Error while checking if index exists: %s", err)
-		return err
-	}
-
-	if !exists {
-		idx, err := Insert2Index(client, index, data)
+	for _, repository := range data.Repositories {
+		idx, err := Insert2Index(client, index, repository)
 		if err != nil {
 			log.Printf("Index %s created", idx.Index)
 		}
@@ -46,23 +38,23 @@ func CreateIndex(index string, data model.User) error {
 }
 
 // Insert2Index inserts your data on an index ...
-func Insert2Index(client *elastic.Client, index string, data model.User) (*elastic.IndexResponse, error) {
+func Insert2Index(client *elastic.Client, index string, data model.Repository) (*elastic.IndexResponse, error) {
 	body := IndexBody{}
 	body.construct(data)
+	id := strconv.Itoa(data.ID)
 
 	idx, err := client.Index().
 		Index(index).
-		Type("static").
-		Id(data.ID).
+		Id(id).
 		BodyJson(&body).
 		Do(context.Background())
 
 	if err != nil {
-		log.Printf("Error indexing %s to index %s, type %s\n", idx.Id, idx.Index, idx.Type)
+		log.Printf("Error indexing %s to index %s \n", idx.Id, idx.Index)
 		return idx, err
 	}
 
-	log.Printf("Indexed %s to index %s, type %s\n", idx.Id, idx.Index, idx.Type)
+	log.Printf("Indexed %s to index %s \n", idx.Id, idx.Index)
 
 	return idx, err
 }
@@ -71,7 +63,6 @@ func Insert2Index(client *elastic.Client, index string, data model.User) (*elast
 func GetDataByID(client *elastic.Client, id string, index string) (*elastic.GetResult, error) {
 	resp, err := client.Get().
 		Index(index).
-		Type("static").
 		Id(id).
 		Do(context.Background())
 
@@ -86,25 +77,37 @@ func GetDataByID(client *elastic.Client, id string, index string) (*elastic.GetR
 }
 
 // GetDataByQuery ...
-func GetDataByQuery(client *elastic.Client, index string, query string) error {
-	fuzzy := elastic.NewFuzzyQuery("tags", query)
+func GetDataByQuery(client *elastic.Client, index string, query string) ([]model.Repository, error) {
+	results := make([]model.Repository, 0)
+	user := IndexBody{}
+
+	prefix := elastic.NewPrefixQuery("repository.tags", query)
 	searchResult, err := client.Search().
 		Index(index).
-		Query(fuzzy).
+		Query(prefix).
 		From(0).Size(200).
 		Pretty(true).
 		Do(context.Background())
 
 	if err != nil {
 		log.Printf("Error getting document, err: %s", err)
-		return err
+		return results, err
 	}
-	user := IndexBody{}
+
 	for _, item := range searchResult.Each(reflect.TypeOf(user)) {
 		i := item.(IndexBody)
-		spew.Dump(i)
+		results = append(results, model.Repository{
+			ID:           i.Repository.ID,
+			Name:         i.Repository.Name,
+			Description:  i.Repository.Description,
+			URL:          i.Repository.URL,
+			Language:     i.Repository.Language,
+			Tags:         i.Repository.Tags,
+			TagSuggester: i.Repository.TagSuggester,
+		})
+
 	}
-	return nil
+	return results, nil
 }
 
 // NewClient returns a new *elastic.Client
@@ -119,9 +122,8 @@ func NewClient() *elastic.Client {
 	return client
 }
 
-func (b *IndexBody) construct(data model.User) error {
-	b.ID = data.ID
-	b.Repositories = data.Repositories
+func (b *IndexBody) construct(data model.Repository) error {
+	b.Repository = data
 
 	return nil
 }

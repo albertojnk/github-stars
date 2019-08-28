@@ -1,6 +1,7 @@
 package endpoint
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -32,4 +33,14 @@ func Handlers() http.Handler {
 func ConnectServer() {
 	log.Println("Server is up")
 	Handlers()
+}
+
+// JSONResponse handles http responses
+func JSONResponse(rw http.ResponseWriter, body interface{}, code int) {
+	rw.Header().Set("Content-Type", "application/json")
+	rw.WriteHeader(code)
+
+	if nil != body {
+		json.NewEncoder(rw).Encode(body)
+	}
 }

@@ -1,7 +1,6 @@
 package endpoint
 
 import (
-	"encoding/json"
 	"golang-crud-spa/backend/datasource"
 	"log"
 	"net/http"
@@ -22,10 +21,11 @@ func ListRepositories(rw http.ResponseWriter, r *http.Request) {
 	users, err := datasource.ListUserRepositories(values[0])
 	if err != nil {
 		log.Printf("error while accessing DB, err: %s", err)
+		status, err := HandleErrors(err)
+		JSONResponse(rw, err, status)
 		return
 	}
 
 	// Endoce response into json
-	rw.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(rw).Encode(users)
+	JSONResponse(rw, users, http.StatusOK)
 }

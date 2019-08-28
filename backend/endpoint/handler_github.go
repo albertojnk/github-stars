@@ -9,8 +9,8 @@ import (
 	"net/http"
 )
 
-// GetStarredRepositories gets (duh) the starred repositories from github
-func GetStarredRepositories(username string) ([]model.StarredRepositories, error) {
+// GetStarredRepositories get starred repositories from github
+func GetStarredRepositories(username string) ([]model.Repository, error) {
 	// Setting up a http request to the github API
 	url := fmt.Sprintf("https://api.github.com/users/%s/starred?per_page=200", username)
 	req, err := http.NewRequest("GET", url, nil)
@@ -31,13 +31,21 @@ func GetStarredRepositories(username string) ([]model.StarredRepositories, error
 		return nil, err
 	}
 
-	respData := []model.StarredRepositories{}
+	respData := []model.Repository{}
 
 	// Unmarshaling the results
 	err = json.Unmarshal(body, &respData)
 	if err != nil {
 		log.Printf("error while unmarshaling, err: %s", err)
 		return nil, err
+	}
+
+	for i, repo := range respData {
+		if repo.Language == "" {
+			respData[i].TagSuggester = fmt.Sprint("Documentation")
+		} else {
+			respData[i].TagSuggester = fmt.Sprint(repo.Language)
+		}
 	}
 
 	return respData, nil

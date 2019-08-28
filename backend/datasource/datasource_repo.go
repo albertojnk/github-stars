@@ -8,7 +8,7 @@ import (
 )
 
 // CreateUserRepositories creates a new user with the repositories on DB
-func CreateUserRepositories(username string, repositories []model.StarredRepositories) error {
+func CreateUserRepositories(username string, repositories []model.Repository) error {
 	db := database
 	user := model.User{}
 
@@ -19,12 +19,13 @@ func CreateUserRepositories(username string, repositories []model.StarredReposit
 
 	for _, git := range repositories {
 		repoMap[git.ID] = model.Repository{
-			ID:          git.ID,
-			Name:        git.Name,
-			Description: git.Description,
-			URL:         git.URL,
-			Language:    git.Language,
-			Tags:        git.Tags,
+			ID:           git.ID,
+			Name:         git.Name,
+			Description:  git.Description,
+			URL:          git.URL,
+			Language:     git.Language,
+			Tags:         git.Tags,
+			TagSuggester: git.TagSuggester,
 		}
 	}
 

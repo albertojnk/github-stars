@@ -3,6 +3,7 @@ package endpoint
 import (
 	"encoding/json"
 	"golang-crud-spa/backend/datasource"
+	"golang-crud-spa/backend/search"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -23,6 +24,8 @@ func UpdateRepositoryTags(rw http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("something went wrong, err: %s", err)
+		status, err := HandleErrors(err)
+		JSONResponse(rw, err, status)
 		return
 	}
 
@@ -32,6 +35,8 @@ func UpdateRepositoryTags(rw http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &reqData)
 	if err != nil {
 		log.Printf("error while unmarshaling, err: %s", err)
+		status, err := HandleErrors(err)
+		JSONResponse(rw, err, status)
 		return
 	}
 
@@ -41,12 +46,21 @@ func UpdateRepositoryTags(rw http.ResponseWriter, r *http.Request) {
 	user, err := datasource.UpdateUserRepositoryTags(reqData.Username, reqData.RepositoryID, tags)
 	if err != nil {
 		log.Printf("error finding repository, err: %s", err)
+		status, err := HandleErrors(err)
+		JSONResponse(rw, err, status)
+		return
+	}
+
+	err = search.CreateIndex(indexName, user)
+	if err != nil {
+		log.Printf("Error creating index: %s", err)
+		status, err := HandleErrors(err)
+		JSONResponse(rw, err, status)
 		return
 	}
 
 	// Encode response into json
-	rw.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(rw).Encode(user.Repositories)
+	JSONResponse(rw, user.Repositories, http.StatusOK)
 }
 
 // removeDuplicates will remove all duplicates from a given string slice

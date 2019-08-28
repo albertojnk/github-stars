@@ -77,6 +77,7 @@
             type="text"
             name="tags"
             id="tags"
+            v-bind:placeholder="currentRepo.tag_suggester"
             v-model="currentTags"
             @keypress="sendMonitor"
           />
@@ -114,21 +115,15 @@ export default {
     if (this.id == undefined && this.loading != true) {
       this.setLoading({ loading: true, loaded: false });
       let user = JSON.parse(localStorage.getItem("user"));
-      this.$http
-        .get(this.APIURL + "/list?username=" + user.id)
-        .then(resp => {
-          this.response = {
-            id: resp.data._id,
-            repositories: resp.data.repositories
-          };
-          localStorage.setItem("user", JSON.stringify(this.response));
-          this.setNewUser(this.response);
-          this.setLoaded({ loading: false, loaded: true });
-        })
-        .catch(err => {
-          console.log(err);
-          this.$router.push("/");
-        });
+
+      this.response = {
+        id: user.id,
+        repositories: user.repositories
+      };
+
+      localStorage.setItem("user", JSON.stringify(this.response));
+      this.setNewUser(this.response);
+      this.setLoaded({ loading: false, loaded: true });
     }
   },
   computed: {
@@ -141,10 +136,18 @@ export default {
         this.$http
           .post(this.APIURL + "/search", {
             id: this.id,
-            value: this.searchValue
+            search: this.searchValue
           })
           .then(resp => {
-            console.log(resp);
+            this.setNewUser({
+              id: this.id,
+              repositories: resp.data
+            });
+            this.response = {
+              id: this.id,
+              repositories: resp.data
+            };
+            localStorage.setItem("user", JSON.stringify(this.response));
           });
       }
     },
@@ -242,17 +245,21 @@ tr:nth-child(odd) {
 }
 .repository-name {
   border-right: solid 1px #000000;
+  padding-left: 10px;
 }
 .repository-description {
   border-right: solid 1px #000000;
+  padding-left: 10px;
 }
 .repository-language {
   border-right: solid 1px #000000;
   padding: 0 5px;
+  padding-left: 10px;
 }
 .repository-tags {
   border-right: solid 1px #000000;
   padding: 0 5px;
+  padding-left: 10px;
 }
 .repository-edit {
   padding: 0 7px;
@@ -361,6 +368,11 @@ tr:nth-child(odd) {
     margin-left: -37px;
   }
 }
+
+.tableBody {
+  text-align: left;
+}
+
 .search {
   padding: 6px 15px 6px 30px;
   margin: 3px;

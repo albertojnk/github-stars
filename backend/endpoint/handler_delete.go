@@ -22,6 +22,8 @@ func DeleteRepositoryTags(rw http.ResponseWriter, r *http.Response) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("something went wrong, err: %s", err)
+		status, err := HandleErrors(err)
+		JSONResponse(rw, err, status)
 		return
 	}
 
@@ -31,17 +33,20 @@ func DeleteRepositoryTags(rw http.ResponseWriter, r *http.Response) {
 	err = json.Unmarshal(body, &reqData)
 	if err != nil {
 		log.Printf("error while unmarshaling, err: %s", err)
+		status, err := HandleErrors(err)
+		JSONResponse(rw, err, status)
 		return
 	}
 
 	user, err := datasource.DeleteUserRepositoryTags(reqData.Username, reqData.RepositoryID)
 	if err != nil {
 		log.Printf("something went wrong, err: %s", err)
+		status, err := HandleErrors(err)
+		JSONResponse(rw, err, status)
 		return
 	}
 
 	// Encode response into json
-	rw.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(rw).Encode(user)
+	JSONResponse(rw, user, http.StatusOK)
 
 }
