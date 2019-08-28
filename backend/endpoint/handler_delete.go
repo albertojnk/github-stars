@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"encoding/json"
+	"golang-crud-spa/backend/datasource"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -33,7 +34,7 @@ func DeleteRepositoryTags(rw http.ResponseWriter, r *http.Response) {
 		return
 	}
 
-	user, err := DeleteUserRepositoryTags(reqData.Username, reqData.RepositoryID)
+	user, err := datasource.DeleteUserRepositoryTags(reqData.Username, reqData.RepositoryID)
 	if err != nil {
 		log.Printf("something went wrong, err: %s", err)
 		return

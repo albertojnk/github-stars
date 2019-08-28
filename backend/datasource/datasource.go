@@ -1,4 +1,4 @@
-package endpoint
+package datasource
 
 import (
 	"log"
@@ -8,9 +8,10 @@ import (
 )
 
 var session *mgo.Session
+var database *mgo.Database
 
 // Connect will connect us to mongoDB
-func Connect() *mgo.Database {
+func connect() {
 
 	var err error
 	var s *mgo.Session
@@ -30,5 +31,21 @@ func Connect() *mgo.Database {
 	session = s
 	log.Println("MongoDB connected")
 
-	return session.DB(db)
+	database = session.DB(db)
+}
+
+func disconnect() {
+	if session != nil {
+		session.Close()
+	}
+}
+
+// BeforeStart will be called as the program starts ...
+func BeforeStart() {
+	connect()
+}
+
+// AfterStop will be called after program stops ...
+func AfterStop() {
+	disconnect()
 }

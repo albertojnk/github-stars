@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"encoding/json"
+	"golang-crud-spa/backend/datasource"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -37,7 +38,7 @@ func UpdateRepositoryTags(rw http.ResponseWriter, r *http.Request) {
 	tags := removeDuplicates(reqData.Tags)
 
 	// update tags on DB
-	user, err := UpdateUserRepositoryTags(reqData.Username, reqData.RepositoryID, tags)
+	user, err := datasource.UpdateUserRepositoryTags(reqData.Username, reqData.RepositoryID, tags)
 	if err != nil {
 		log.Printf("error finding repository, err: %s", err)
 		return

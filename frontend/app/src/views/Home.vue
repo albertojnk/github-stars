@@ -54,14 +54,11 @@ export default {
         })
         .then(resp => {
           this.response = {
-            id: resp.data[0]._id,
-            repositories: resp.data[0].repositories
+            id: resp.data._id,
+            repositories: resp.data.repositories
           };
-          this.setNewUser(this.response);
-
-          // the test requested to set on localstorage but I doubt it is necessary ?
           localStorage.setItem("user", JSON.stringify(this.response));
-
+          this.setNewUser(this.response);
           this.setLoaded({ loading: false, loaded: true });
         })
         .catch(err => {

@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"encoding/json"
+	"golang-crud-spa/backend/datasource"
 	"log"
 	"net/http"
 )
@@ -18,7 +19,7 @@ func ListRepositories(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	// get the user repositories from DB
-	users, err := ListUserRepositories(values[0])
+	users, err := datasource.ListUserRepositories(values[0])
 	if err != nil {
 		log.Printf("error while accessing DB, err: %s", err)
 		return

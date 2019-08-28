@@ -111,18 +111,18 @@ export default {
     };
   },
   mounted() {
-    if (this.id == undefined) {
+    if (this.id == undefined && this.loading != true) {
       this.setLoading({ loading: true, loaded: false });
       let user = JSON.parse(localStorage.getItem("user"));
       this.$http
         .get(this.APIURL + "/list?username=" + user.id)
         .then(resp => {
           this.response = {
-            id: resp.data[0]._id,
-            repositories: resp.data[0].repositories
+            id: resp.data._id,
+            repositories: resp.data.repositories
           };
-          this.setNewUser(this.response);
           localStorage.setItem("user", JSON.stringify(this.response));
+          this.setNewUser(this.response);
           this.setLoaded({ loading: false, loaded: true });
         })
         .catch(err => {
