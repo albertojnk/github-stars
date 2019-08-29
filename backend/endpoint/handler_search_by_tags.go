@@ -53,7 +53,7 @@ func SearchHandler(rw http.ResponseWriter, r *http.Request) {
 	} else {
 
 		client := search.NewClient()
-		repositories, err = search.GetDataByQuery(client, indexName, reqData.Search)
+		repositories, err = search.GetDataByQuery(client, indexName, reqData.ID, reqData.Search)
 		if err != nil {
 			status, err := HandleErrors(err)
 			JSONResponse(rw, err, status)

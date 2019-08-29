@@ -13,6 +13,7 @@ import (
 
 // IndexBody is the body template for indexing ...
 type IndexBody struct {
+	ID         string           `json:"id"`
 	Repository model.Repository `json:"repository"`
 }
 
@@ -27,31 +28,33 @@ func CreateIndex(index string, data model.User) error {
 		return err
 	}
 
-	for _, repository := range data.Repositories {
-		idx, err := Insert2Index(client, index, repository)
-		if err != nil {
-			log.Printf("Index %s created", idx.Index)
-		}
+	_, err = Insert2Index(client, index, data.ID, data.Repositories)
+	if err != nil {
+		log.Printf("error creating index %s", err)
+		return err
 	}
 
 	return nil
 }
 
 // Insert2Index inserts your data on an index ...
-func Insert2Index(client *elastic.Client, index string, data model.Repository) (*elastic.IndexResponse, error) {
-	body := IndexBody{}
-	body.construct(data)
-	id := strconv.Itoa(data.ID)
+func Insert2Index(client *elastic.Client, index string, id string, data []model.Repository) (idx *elastic.IndexResponse, err error) {
 
-	idx, err := client.Index().
-		Index(index).
-		Id(id).
-		BodyJson(&body).
-		Do(context.Background())
+	for _, repository := range data {
+		body := IndexBody{}
+		body.construct(id, repository)
+		repoID := strconv.Itoa(repository.ID)
 
-	if err != nil {
-		log.Printf("Error indexing %s to index %s \n", idx.Id, idx.Index)
-		return idx, err
+		idx, err = client.Index().
+			Index(index).
+			Id(repoID).
+			BodyJson(&body).
+			Do(context.Background())
+
+		if err != nil {
+			log.Printf("Error indexing %s to index %s \n", idx.Id, idx.Index)
+			return idx, err
+		}
 	}
 
 	log.Printf("Indexed %s to index %s \n", idx.Id, idx.Index)
@@ -77,14 +80,16 @@ func GetDataByID(client *elastic.Client, id string, index string) (*elastic.GetR
 }
 
 // GetDataByQuery ...
-func GetDataByQuery(client *elastic.Client, index string, query string) ([]model.Repository, error) {
+func GetDataByQuery(client *elastic.Client, index string, id string, query string) ([]model.Repository, error) {
 	results := make([]model.Repository, 0)
 	user := IndexBody{}
 
+	match := elastic.NewMatchQuery("id", id)
 	prefix := elastic.NewPrefixQuery("repository.tags", query)
+	bq := elastic.NewBoolQuery().Must(match, prefix)
 	searchResult, err := client.Search().
 		Index(index).
-		Query(prefix).
+		Query(bq).
 		From(0).Size(200).
 		Pretty(true).
 		Do(context.Background())
@@ -122,7 +127,8 @@ func NewClient() *elastic.Client {
 	return client
 }
 
-func (b *IndexBody) construct(data model.Repository) error {
+func (b *IndexBody) construct(id string, data model.Repository) error {
+	b.ID = id
 	b.Repository = data
 
 	return nil
