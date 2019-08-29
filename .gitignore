@@ -1,2 +1,4 @@
 golang-crud-spa
 .data
+go.mod
+go.sum
