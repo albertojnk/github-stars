@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"strconv"
 
-	elastic "github.com/olivere/elastic/v7"
+	"github.com/olivere/elastic/v7"
 )
 
 // IndexBody is the body template for indexing ...
