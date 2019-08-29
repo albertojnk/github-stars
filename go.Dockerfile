@@ -1,10 +1,13 @@
-FROM golang as builder
+FROM golang:latest
 
 ENV GO111MODULE=on
 
-WORKDIR /golang-crud-spa
+WORKDIR /app
 
-COPY . .
+COPY ./go.mod .
+COPY ./go.sum .
+COPY ./backend ./backend
+COPY ./main.go .
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 

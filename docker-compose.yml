@@ -1,0 +1,55 @@
+version: '3.7'
+
+services:
+  mongodb:
+    container_name: mongodb
+    image: mongo:3.6
+    command: mongod --port 27017
+    volumes:
+    - .data/mongo:/data/db
+    logging:
+      driver: none
+    ports:
+    - 27017:27019
+    network_mode: "host"
+  
+  backend:
+    container_name: golang-backend
+    build:
+      context: .
+      dockerfile: go.Dockerfile
+    ports:
+    - 8090:8090
+    network_mode: "host"
+
+  frontend:
+    container_name: vue-frontend
+    build:
+      context: .
+      dockerfile: vue.Dockerfile
+    ports:
+    - 8080:8080
+    network_mode: "host"
+   
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.1
+    container_name: elasticsearch
+    environment:
+      - node.name=es01
+      - cluster.initial_master_nodes=es01
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    network_mode: "host"
+
+volumes:
+  esdata01:
+    driver: local
