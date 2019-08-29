@@ -1,7 +1,7 @@
 # golang-crud-spa
 
 
-If you already have Docker/Docker-Compose skip **Setup** section
+If you don't have Docker/Docker-Compose check **Setup** section below
 
 
 <details>
@@ -65,13 +65,30 @@ $ sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
 Run the application is very simple:
 
-* clone this repository to any directory outside $GOPATH
+* check your $GOPATH
 
 ```
 $ echo $GOPATH
 ```
 
-* type on terminal:
+* clone this repository to any directory outside $GOPATH
+
+```
+$ git clone https://github.com/albertojnk/golang-crud-spa.git
+```
+ or
+
+```
+$ git clone git@github.com:albertojnk/golang-crud-spa.git
+```
+
+* cd to the repository:
+
+```
+$ cd golang-crud-spa
+```
+
+* run docker-compose:
 
 ```
 $ docker-compose up
