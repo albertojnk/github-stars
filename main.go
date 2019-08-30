@@ -4,15 +4,39 @@ import (
 	"golang-crud-spa/backend/datasource"
 	"golang-crud-spa/backend/endpoint"
 	"log"
+	"net/http"
 
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/labstack/echo"
 )
 
-var client *mongo.Client
+// Service serves a router
+type Service struct {
+	router *echo.Echo
+}
 
 func main() {
 	defer datasource.AfterStop()
 	log.Println("Starting the application...")
 	datasource.BeforeStart()
-	endpoint.ConnectServer()
+
+	service, err := NewService()
+	if err != nil {
+		panic("failed to start")
+	}
+	service.Start()
+}
+
+// NewService returns a server service
+func NewService() (*Service, error) {
+	svc := Service{
+		router: endpoint.NewEndpoint(),
+	}
+
+	return &svc, nil
+}
+
+// Start endpoint
+func (s Service) Start() {
+	log.Println("HTTP Listening on port 8090")
+	log.Fatal(http.ListenAndServe(":8090", s.router))
 }

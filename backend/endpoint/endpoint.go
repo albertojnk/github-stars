@@ -6,46 +6,44 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"net/http"
 
-	"github.com/gorilla/handlers"
-
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 var indexName = "starred_repositories"
 
-// Handlers route each handler registered in this function
-func Handlers() http.Handler {
-	router := mux.NewRouter()
+// NewEndpoint route each handler registered in this function
+func NewEndpoint() *echo.Echo {
+	e := echo.New()
 
-	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "XMLHttpRequest", "Content-Type"})
-	origins := handlers.AllowedOrigins([]string{"*"})
-	methods := handlers.AllowedMethods([]string{"POST", "GET", "PATCH"})
-	router.HandleFunc("/create", CreateRepository).Methods("POST")
-	router.HandleFunc("/list", ListRepositories).Methods("GET")
-	router.HandleFunc("/update", UpdateRepositoryTags).Methods("PATCH")
-	router.HandleFunc("/search", SearchHandler).Methods("POST")
+	svc := e.Group("")
 
-	log.Fatal(http.ListenAndServe(":8090", handlers.CORS(origins, methods, headers)(router)))
+	//add middleware
+	svc.Use(middleware.Recover())
+	svc.Use(middleware.RequestID())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		Skipper:      middleware.DefaultSkipper,
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
+	}))
 
-	return router
-}
+	// SERVICES LAYER
+	svc.POST("/create", CreateRepository)
+	svc.POST("/search", SearchHandler)
 
-// ConnectServer ...
-func ConnectServer() {
-	log.Println("Server is up")
-	Handlers()
-}
+	svc.GET("/list", ListRepositories)
+	svc.PATCH("/update", UpdateRepositoryTags)
 
-// JSONResponse handles http responses
-func JSONResponse(rw http.ResponseWriter, body interface{}, code int) {
-	rw.Header().Set("Content-Type", "application/json")
-	rw.WriteHeader(code)
+	// WEB LAYER
+	webPath := "frontend/app/dist"
 
-	if nil != body {
-		json.NewEncoder(rw).Encode(body)
-	}
+	sts := e.Group("")
+	sts.Static("/", webPath)
+	sts.Static("/list", webPath)
+
+	return e
 }
 
 // Decode body

@@ -5,6 +5,8 @@ import (
 	"golang-crud-spa/backend/search"
 	"log"
 	"net/http"
+
+	"github.com/labstack/echo"
 )
 
 // UpdateRepositoryTagsRequest is a struct based on the requested parameters of UpdateRepositoryTags
@@ -15,14 +17,17 @@ type UpdateRepositoryTagsRequest struct {
 }
 
 // UpdateRepositoryTags will update ONE repository of a given user
-func UpdateRepositoryTags(rw http.ResponseWriter, r *http.Request) {
+func UpdateRepositoryTags(c echo.Context) error {
+	r := c.Request()
+
 	defer r.Body.Close()
 
-	reqData, err := Decode(r.Body, "delete")
+	reqData, err := Decode(r.Body, "update")
 	if err != nil {
 		log.Printf("something went wrong decoding body, err: %s", err)
 		status, err := HandleErrors(err)
-		JSONResponse(rw, err, status)
+		c.JSON(status, err)
+		return err
 	}
 
 	data := reqData.(UpdateRepositoryTagsRequest)
@@ -34,20 +39,22 @@ func UpdateRepositoryTags(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("error finding repository, err: %s", err)
 		status, err := HandleErrors(err)
-		JSONResponse(rw, err, status)
-		return
+		c.JSON(status, err)
+		return err
 	}
 
 	err = search.CreateIndex(indexName, user)
 	if err != nil {
 		log.Printf("Error creating index: %s", err)
 		status, err := HandleErrors(err)
-		JSONResponse(rw, err, status)
-		return
+		c.JSON(status, err)
+		return err
 	}
 
 	// Encode response into json
-	JSONResponse(rw, user.Repositories, http.StatusOK)
+	c.JSON(http.StatusCreated, user.Repositories)
+
+	return nil
 }
 
 // removeDuplicates will remove all duplicates from a given string slice

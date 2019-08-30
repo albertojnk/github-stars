@@ -113,7 +113,6 @@ export default {
   },
   mounted() {
     if (this.id == undefined && this.loading != true) {
-      this.$router.go();
       this.setLoading({ loading: true, loaded: false });
       let user = JSON.parse(localStorage.getItem("user"));
 
@@ -153,6 +152,7 @@ export default {
       }
     },
     Save() {
+      this.modal = false
       this.setLoading({ loading: true, loaded: false });
       this.$http
         .patch(this.APIURL + "/update", {
@@ -183,7 +183,7 @@ export default {
       }
     },
     transformInArray(value) {
-      var splited = value.split(",");
+      var splited = value.split(/[ ,]+/);
       var result = [];
       splited.forEach(tag => {
         if (tag.trim() !== "") {

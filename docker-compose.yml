@@ -14,26 +14,16 @@ services:
     networks:
       - custom-network
   
-  backend:
-    container_name: golang-backend
+  app:
+    container_name: app
     build:
       context: .
-      dockerfile: go.Dockerfile
+      dockerfile: Dockerfile
     ports:
     - 8090:8090
     networks:
       - custom-network
 
-  frontend:
-    container_name: vue-frontend
-    build:
-      context: .
-      dockerfile: vue.Dockerfile
-    ports:
-    - 8080:8080
-    networks:
-      - custom-network
-   
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.3.1
     environment:

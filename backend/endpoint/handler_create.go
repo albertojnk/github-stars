@@ -5,6 +5,8 @@ import (
 	"golang-crud-spa/backend/search"
 	"log"
 	"net/http"
+
+	"github.com/labstack/echo"
 )
 
 // CreateRepositoryRequest is the struct we will use to unmarshal the request
@@ -13,14 +15,17 @@ type CreateRepositoryRequest struct {
 }
 
 // CreateRepository is the handler that will create our repository in the database
-func CreateRepository(rw http.ResponseWriter, r *http.Request) {
+func CreateRepository(c echo.Context) error {
+	r := c.Request()
+
 	defer r.Body.Close()
 
 	reqData, err := Decode(r.Body, "create")
 	if err != nil {
 		log.Printf("something went wrong decoding body, err: %s", err)
 		status, err := HandleErrors(err)
-		JSONResponse(rw, err, status)
+		c.JSON(status, err)
+		return err
 	}
 
 	data := reqData.(CreateRepositoryRequest)
@@ -31,16 +36,16 @@ func CreateRepository(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("error while creating, err: %s", err)
 		status, err := HandleErrors(err)
-		JSONResponse(rw, err, status)
-		return
+		c.JSON(status, err)
+		return err
 	}
 
 	user, err := datasource.ListUserRepositories(data.Username)
 	if err != nil {
 		log.Printf("error while listing, err: %s", err)
 		status, err := HandleErrors(err)
-		JSONResponse(rw, err, status)
-		return
+		c.JSON(status, err)
+		return err
 	}
 
 	if len(user.Repositories) > 0 {
@@ -48,11 +53,13 @@ func CreateRepository(rw http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Printf("Error creating index: %s", err)
 			status, err := HandleErrors(err)
-			JSONResponse(rw, err, status)
-			return
+			c.JSON(status, err)
+			return err
 		}
 	}
 
 	// Encode response into json
-	JSONResponse(rw, user, http.StatusCreated)
+	c.JSON(http.StatusCreated, user)
+
+	return nil
 }

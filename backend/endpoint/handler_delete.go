@@ -4,6 +4,8 @@ import (
 	"golang-crud-spa/backend/datasource"
 	"log"
 	"net/http"
+
+	"github.com/labstack/echo"
 )
 
 // DeleteRepositoryTagsRequest is a struct based on the requested parameters of DeleteRepositoryTags
@@ -14,14 +16,16 @@ type DeleteRepositoryTagsRequest struct {
 }
 
 // DeleteRepositoryTags is the endpoint that will manage tags deletion
-func DeleteRepositoryTags(rw http.ResponseWriter, r *http.Response) {
+func DeleteRepositoryTags(c echo.Context) error {
+	r := c.Request()
 	defer r.Body.Close()
 
 	reqData, err := Decode(r.Body, "delete")
 	if err != nil {
 		log.Printf("something went wrong decoding body, err: %s", err)
 		status, err := HandleErrors(err)
-		JSONResponse(rw, err, status)
+		c.JSON(status, err)
+		return err
 	}
 
 	data := reqData.(DeleteRepositoryTagsRequest)
@@ -30,11 +34,12 @@ func DeleteRepositoryTags(rw http.ResponseWriter, r *http.Response) {
 	if err != nil {
 		log.Printf("something went wrong, err: %s", err)
 		status, err := HandleErrors(err)
-		JSONResponse(rw, err, status)
-		return
+		c.JSON(status, err)
+		return err
 	}
 
 	// Encode response into json
-	JSONResponse(rw, user, http.StatusOK)
+	c.JSON(http.StatusOK, user)
 
+	return nil
 }

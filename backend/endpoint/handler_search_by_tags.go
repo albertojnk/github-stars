@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/labstack/echo"
 )
 
 // SearchHandlerRequest is the request params struct
@@ -17,7 +19,9 @@ type SearchHandlerRequest struct {
 }
 
 // SearchHandler is the handler that will create our repository in the database
-func SearchHandler(rw http.ResponseWriter, r *http.Request) {
+func SearchHandler(c echo.Context) error {
+	r := c.Request()
+
 	defer r.Body.Close()
 
 	repositories := []model.Repository{}
@@ -26,8 +30,8 @@ func SearchHandler(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("something went wrong, err: %s", err)
 		status, err := HandleErrors(err)
-		JSONResponse(rw, err, status)
-		return
+		c.JSON(status, err)
+		return err
 	}
 
 	reqData := SearchHandlerRequest{}
@@ -36,8 +40,8 @@ func SearchHandler(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("error while unmarshaling, err: %s", err)
 		status, err := HandleErrors(err)
-		JSONResponse(rw, err, status)
-		return
+		c.JSON(status, err)
+		return err
 	}
 
 	if reqData.Search == "" {
@@ -46,8 +50,8 @@ func SearchHandler(rw http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Printf("error while accessing DB, err: %s", err)
 			status, err := HandleErrors(err)
-			JSONResponse(rw, err, status)
-			return
+			c.JSON(status, err)
+			return err
 		}
 		repositories = users.Repositories
 	} else {
@@ -55,17 +59,19 @@ func SearchHandler(rw http.ResponseWriter, r *http.Request) {
 		client, err := search.NewClient()
 		if err != nil {
 			status, err := HandleErrors(err)
-			JSONResponse(rw, err, status)
-			return
+			c.JSON(status, err)
+			return err
 		}
 
 		repositories, err = search.GetDataByQuery(client, indexName, reqData.ID, reqData.Search)
 		if err != nil {
 			status, err := HandleErrors(err)
-			JSONResponse(rw, err, status)
-			return
+			c.JSON(status, err)
+			return err
 		}
 	}
 
-	JSONResponse(rw, repositories, http.StatusOK)
+	c.JSON(http.StatusOK, repositories)
+
+	return nil
 }
