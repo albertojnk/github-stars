@@ -52,7 +52,13 @@ func SearchHandler(rw http.ResponseWriter, r *http.Request) {
 		repositories = users.Repositories
 	} else {
 
-		client := search.NewClient()
+		client, err := search.NewClient()
+		if err != nil {
+			status, err := HandleErrors(err)
+			JSONResponse(rw, err, status)
+			return
+		}
+
 		repositories, err = search.GetDataByQuery(client, indexName, reqData.ID, reqData.Search)
 		if err != nil {
 			status, err := HandleErrors(err)

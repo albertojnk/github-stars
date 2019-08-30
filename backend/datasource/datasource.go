@@ -17,7 +17,7 @@ func connect() {
 	var s *mgo.Session
 
 	db := "golang-crud-spa"
-	uri := "mongodb://localhost:27017"
+	uri := "mongodb://mongodb:27017"
 
 	log.Println("Starting connection with MongoDB...")
 

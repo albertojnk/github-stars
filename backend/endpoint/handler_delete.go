@@ -1,9 +1,7 @@
 package endpoint
 
 import (
-	"encoding/json"
 	"golang-crud-spa/backend/datasource"
-	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -19,26 +17,16 @@ type DeleteRepositoryTagsRequest struct {
 func DeleteRepositoryTags(rw http.ResponseWriter, r *http.Response) {
 	defer r.Body.Close()
 
-	body, err := ioutil.ReadAll(r.Body)
+	reqData, err := Decode(r.Body, "delete")
 	if err != nil {
-		log.Printf("something went wrong, err: %s", err)
+		log.Printf("something went wrong decoding body, err: %s", err)
 		status, err := HandleErrors(err)
 		JSONResponse(rw, err, status)
-		return
 	}
 
-	reqData := DeleteRepositoryTagsRequest{}
+	data := reqData.(DeleteRepositoryTagsRequest)
 
-	// Unmarshaling the decoded username
-	err = json.Unmarshal(body, &reqData)
-	if err != nil {
-		log.Printf("error while unmarshaling, err: %s", err)
-		status, err := HandleErrors(err)
-		JSONResponse(rw, err, status)
-		return
-	}
-
-	user, err := datasource.DeleteUserRepositoryTags(reqData.Username, reqData.RepositoryID)
+	user, err := datasource.DeleteUserRepositoryTags(data.Username, data.RepositoryID)
 	if err != nil {
 		log.Printf("something went wrong, err: %s", err)
 		status, err := HandleErrors(err)

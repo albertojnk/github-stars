@@ -1,10 +1,8 @@
 package endpoint
 
 import (
-	"encoding/json"
 	"golang-crud-spa/backend/datasource"
 	"golang-crud-spa/backend/search"
-	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -20,30 +18,19 @@ type UpdateRepositoryTagsRequest struct {
 func UpdateRepositoryTags(rw http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
-	// Decode the request body
-	body, err := ioutil.ReadAll(r.Body)
+	reqData, err := Decode(r.Body, "delete")
 	if err != nil {
-		log.Printf("something went wrong, err: %s", err)
+		log.Printf("something went wrong decoding body, err: %s", err)
 		status, err := HandleErrors(err)
 		JSONResponse(rw, err, status)
-		return
 	}
 
-	reqData := UpdateRepositoryTagsRequest{}
+	data := reqData.(UpdateRepositoryTagsRequest)
 
-	// Unmarshaling the decoded request
-	err = json.Unmarshal(body, &reqData)
-	if err != nil {
-		log.Printf("error while unmarshaling, err: %s", err)
-		status, err := HandleErrors(err)
-		JSONResponse(rw, err, status)
-		return
-	}
-
-	tags := removeDuplicates(reqData.Tags)
+	tags := removeDuplicates(data.Tags)
 
 	// update tags on DB
-	user, err := datasource.UpdateUserRepositoryTags(reqData.Username, reqData.RepositoryID, tags)
+	user, err := datasource.UpdateUserRepositoryTags(data.Username, data.RepositoryID, tags)
 	if err != nil {
 		log.Printf("error finding repository, err: %s", err)
 		status, err := HandleErrors(err)

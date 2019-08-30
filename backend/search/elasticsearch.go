@@ -20,13 +20,7 @@ type IndexBody struct {
 // CreateIndex ...
 func CreateIndex(index string, data model.User) error {
 
-	errorlog := log.New(os.Stdout, "APP ", log.LstdFlags)
-
-	client, err := elastic.NewClient(elastic.SetErrorLog(errorlog))
-	if err != nil {
-		log.Printf("Error creating new client: %s", err)
-		return err
-	}
+	client, err := NewClient()
 
 	_, err = Insert2Index(client, index, data.ID, data.Repositories)
 	if err != nil {
@@ -116,15 +110,16 @@ func GetDataByQuery(client *elastic.Client, index string, id string, query strin
 }
 
 // NewClient returns a new *elastic.Client
-func NewClient() *elastic.Client {
+func NewClient() (*elastic.Client, error) {
 	errorlog := log.New(os.Stdout, "APP ", log.LstdFlags)
 
-	client, err := elastic.NewClient(elastic.SetErrorLog(errorlog))
+	client, err := elastic.NewClient(elastic.SetURL("http://elasticsearch:9200"), elastic.SetErrorLog(errorlog))
 	if err != nil {
 		log.Printf("Error creating new client: %s", err)
+		return client, err
 	}
 
-	return client
+	return client, err
 }
 
 func (b *IndexBody) construct(id string, data model.Repository) error {

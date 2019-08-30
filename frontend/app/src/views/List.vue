@@ -103,7 +103,7 @@ export default {
   components: {},
   data() {
     return {
-      APIURL: "http://localhost:8090",
+      APIURL: "http://frontend:8090",
       modal: false,
       currentRepo: null,
       currentTags: null,

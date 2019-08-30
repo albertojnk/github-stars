@@ -2,6 +2,9 @@ package endpoint
 
 import (
 	"encoding/json"
+	"golang-crud-spa/backend/model"
+	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -43,4 +46,79 @@ func JSONResponse(rw http.ResponseWriter, body interface{}, code int) {
 	if nil != body {
 		json.NewEncoder(rw).Encode(body)
 	}
+}
+
+// Decode body
+func Decode(body io.ReadCloser, bodyType string) (interface{}, error) {
+	switch bodyType {
+	case "create":
+		reqData := CreateRepositoryRequest{}
+		// getting the username from frontend and decoding it
+		b, err := ioutil.ReadAll(body)
+		if err != nil {
+			log.Printf("something went wrong, err: %s", err)
+			return reqData, err
+		}
+
+		// Unmarshaling the decoded username
+		err = json.Unmarshal(b, &reqData)
+		if err != nil {
+			log.Printf("error while unmarshaling, err: %s", err)
+			return reqData, err
+		}
+		return reqData, err
+
+	case "update":
+		reqData := UpdateRepositoryTagsRequest{}
+		// getting the username from frontend and decoding it
+		b, err := ioutil.ReadAll(body)
+		if err != nil {
+			log.Printf("something went wrong, err: %s", err)
+			return reqData, err
+		}
+
+		// Unmarshaling the decoded username
+		err = json.Unmarshal(b, &reqData)
+		if err != nil {
+			log.Printf("error while unmarshaling, err: %s", err)
+			return reqData, err
+		}
+		return reqData, err
+
+	case "repository":
+		reqData := model.Repository{}
+		// getting the username from frontend and decoding it
+		b, err := ioutil.ReadAll(body)
+		if err != nil {
+			log.Printf("something went wrong, err: %s", err)
+			return reqData, err
+		}
+
+		// Unmarshaling the decoded username
+		err = json.Unmarshal(b, &reqData)
+		if err != nil {
+			log.Printf("error while unmarshaling, err: %s", err)
+			return reqData, err
+		}
+		return reqData, err
+
+	case "delete":
+		reqData := DeleteRepositoryTagsRequest{}
+		// getting the username from frontend and decoding it
+		b, err := ioutil.ReadAll(body)
+		if err != nil {
+			log.Printf("something went wrong, err: %s", err)
+			return reqData, err
+		}
+
+		// Unmarshaling the decoded username
+		err = json.Unmarshal(b, &reqData)
+		if err != nil {
+			log.Printf("error while unmarshaling, err: %s", err)
+			return reqData, err
+		}
+		return reqData, err
+	}
+
+	return nil, nil
 }
