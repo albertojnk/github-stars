@@ -103,7 +103,7 @@ export default {
   components: {},
   data() {
     return {
-      APIURL: "http://frontend:8090",
+      APIURL: "http://localhost:8090",
       modal: false,
       currentRepo: null,
       currentTags: null,
@@ -113,6 +113,7 @@ export default {
   },
   mounted() {
     if (this.id == undefined && this.loading != true) {
+      this.$router.go();
       this.setLoading({ loading: true, loaded: false });
       let user = JSON.parse(localStorage.getItem("user"));
 
@@ -395,7 +396,7 @@ tr:nth-child(odd) {
   width: 400px;
   height: 120px;
   margin: 0 auto;
-  position: absolute;
+  position: fixed;
   z-index: 1;
   top: calc(50% - 120px / 2);
   left: calc(50% - 400px / 2);

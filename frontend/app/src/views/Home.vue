@@ -36,7 +36,7 @@ export default {
         repositories: null
       },
       username: "",
-      APIURL: "http://frontend:8090"
+      APIURL: "http://localhost:8090"
     };
   },
   methods: {
