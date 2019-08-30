@@ -2,6 +2,7 @@ package datasource
 
 import (
 	"log"
+	"os"
 	"time"
 
 	"github.com/globalsign/mgo"
@@ -11,13 +12,13 @@ var session *mgo.Session
 var database *mgo.Database
 
 // Connect will connect us to mongoDB
-func connect() {
+func Connect() {
 
 	var err error
 	var s *mgo.Session
 
 	db := "golang-crud-spa"
-	uri := "mongodb://mongodb:27018"
+	uri := os.Getenv("MONGO_URI")
 
 	log.Println("Starting connection with MongoDB...")
 
@@ -34,7 +35,8 @@ func connect() {
 	database = session.DB(db)
 }
 
-func disconnect() {
+// Disconnect session
+func Disconnect() {
 	if session != nil {
 		session.Close()
 	}
@@ -42,10 +44,10 @@ func disconnect() {
 
 // BeforeStart will be called as the program starts ...
 func BeforeStart() {
-	connect()
+	Connect()
 }
 
 // AfterStop will be called after program stops ...
 func AfterStop() {
-	disconnect()
+	Disconnect()
 }

@@ -1,6 +1,6 @@
 FROM golang:latest
 
-ENV GO111MODULE=on
+ENV GO111MODULE=on MONGO_URI="mongodb://mongodb:27018" ES_URL="http://elasticsearch:9200"
 
 WORKDIR /app
 

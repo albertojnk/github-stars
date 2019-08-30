@@ -113,7 +113,7 @@ func GetDataByQuery(client *elastic.Client, index string, id string, query strin
 func NewClient() (*elastic.Client, error) {
 	errorlog := log.New(os.Stdout, "APP ", log.LstdFlags)
 
-	client, err := elastic.NewClient(elastic.SetURL("http://elasticsearch:9200"), elastic.SetErrorLog(errorlog))
+	client, err := elastic.NewClient(elastic.SetURL(os.Getenv("ES_URL")), elastic.SetErrorLog(errorlog))
 	if err != nil {
 		log.Printf("Error creating new client: %s", err)
 		return client, err

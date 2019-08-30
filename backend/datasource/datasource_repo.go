@@ -12,7 +12,11 @@ func CreateUserRepositories(username string, repositories []model.Repository) er
 	db := database
 	user := model.User{}
 
-	db.C("users").Find(bson.M{"_id": username}).One(&user)
+	err := db.C("users").Find(bson.M{"_id": username}).One(&user)
+	if err != nil {
+		log.Printf("error checking if repository exists, err: %s", err)
+		return err
+	}
 
 	updateRepos := []model.Repository{}
 	repoMap := make(map[int]model.Repository, 0)
@@ -36,7 +40,7 @@ func CreateUserRepositories(username string, repositories []model.Repository) er
 		updateRepos = append(updateRepos, repo)
 	}
 
-	_, err := db.C("users").Upsert(
+	_, err = db.C("users").Upsert(
 		bson.M{"_id": username},
 		bson.M{
 			"$set": bson.M{"repositories": updateRepos},
