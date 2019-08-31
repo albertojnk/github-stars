@@ -21,6 +21,9 @@ type IndexBody struct {
 func CreateIndex(index string, data model.User) error {
 
 	client, err := NewClient()
+	if err != nil {
+		return err
+	}
 
 	_, err = Insert2Index(client, index, data.ID, data.Repositories)
 	if err != nil {
@@ -49,9 +52,9 @@ func Insert2Index(client *elastic.Client, index string, id string, data []model.
 			log.Printf("Error indexing %s to index %s \n", idx.Id, idx.Index)
 			return idx, err
 		}
-	}
 
-	log.Printf("Indexed %s to index %s \n", idx.Id, idx.Index)
+		log.Printf("Indexed %s to index %s \n", idx.Id, idx.Index)
+	}
 
 	return idx, err
 }

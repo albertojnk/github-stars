@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/labstack/echo"
 )
 
@@ -32,6 +33,13 @@ func UpdateRepositoryTags(c echo.Context) error {
 
 	data := reqData.(UpdateRepositoryTagsRequest)
 
+	err = data.validate()
+	if err != nil {
+		status, err := HandleErrors(err)
+		c.JSON(status, err)
+		return err
+	}
+
 	tags := removeDuplicates(data.Tags)
 
 	// update tags on DB
@@ -55,6 +63,15 @@ func UpdateRepositoryTags(c echo.Context) error {
 	c.JSON(http.StatusCreated, user.Repositories)
 
 	return nil
+}
+
+// validate UpdateRepositoryTagsRequest
+func (u UpdateRepositoryTagsRequest) validate() error {
+	return validation.ValidateStruct(&u,
+		validation.Field(&u.Username, validation.Required),
+		validation.Field(&u.RepositoryID, validation.Required),
+		validation.Field(&u.Tags, validation.Required),
+	)
 }
 
 // removeDuplicates will remove all duplicates from a given string slice

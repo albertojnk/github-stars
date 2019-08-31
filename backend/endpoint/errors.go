@@ -25,9 +25,15 @@ func HandleErrors(err error) (int, error) {
 	if strings.Contains(err.Error(), "not found") {
 		return http.StatusNotFound, ErrNotFound
 	}
-	if strings.Contains(err.Error(), "bad request") || strings.Contains(err.Error(), "invalid request") {
+	if strings.Contains(err.Error(), "bad request") ||
+		strings.Contains(err.Error(), "invalid request") {
 		return http.StatusBadRequest, ErrBadRequest
 	}
+	if strings.Contains(err.Error(), "cannot be blank") ||
+		strings.Contains(err.Error(), "is missing") {
+		return http.StatusBadRequest, errors.New(err.Error())
+	}
+
 	if strings.Contains(err.Error(), "invalid body") {
 		return http.StatusBadRequest, ErrInvalidBody
 	}

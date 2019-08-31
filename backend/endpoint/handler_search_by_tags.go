@@ -1,14 +1,13 @@
 package endpoint
 
 import (
-	"encoding/json"
 	"golang-crud-spa/backend/datasource"
 	"golang-crud-spa/backend/model"
 	"golang-crud-spa/backend/search"
-	"io/ioutil"
 	"log"
 	"net/http"
 
+	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/labstack/echo"
 )
 
@@ -24,29 +23,28 @@ func SearchHandler(c echo.Context) error {
 
 	defer r.Body.Close()
 
+	reqData, err := Decode(r.Body, "search")
+	if err != nil {
+		log.Printf("something went wrong decoding body, err: %s", err)
+		status, err := HandleErrors(err)
+		c.JSON(status, err)
+		return err
+	}
+
+	data := reqData.(SearchHandlerRequest)
+
+	err = data.validate()
+	if err != nil {
+		status, err := HandleErrors(err)
+		c.JSON(status, err)
+		return err
+	}
+
 	repositories := []model.Repository{}
 
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.Printf("something went wrong, err: %s", err)
-		status, err := HandleErrors(err)
-		c.JSON(status, err)
-		return err
-	}
-
-	reqData := SearchHandlerRequest{}
-
-	err = json.Unmarshal(body, &reqData)
-	if err != nil {
-		log.Printf("error while unmarshaling, err: %s", err)
-		status, err := HandleErrors(err)
-		c.JSON(status, err)
-		return err
-	}
-
-	if reqData.Search == "" {
+	if data.Search == "" {
 		// get the user repositories from DB
-		users, err := datasource.ListUserRepositories(reqData.ID)
+		users, err := datasource.ListUserRepositories(data.ID)
 		if err != nil {
 			log.Printf("error while accessing DB, err: %s", err)
 			status, err := HandleErrors(err)
@@ -54,6 +52,7 @@ func SearchHandler(c echo.Context) error {
 			return err
 		}
 		repositories = users.Repositories
+
 	} else {
 
 		client, err := search.NewClient()
@@ -63,7 +62,7 @@ func SearchHandler(c echo.Context) error {
 			return err
 		}
 
-		repositories, err = search.GetDataByQuery(client, indexName, reqData.ID, reqData.Search)
+		repositories, err = search.GetDataByQuery(client, indexName, data.ID, data.Search)
 		if err != nil {
 			status, err := HandleErrors(err)
 			c.JSON(status, err)
@@ -74,4 +73,10 @@ func SearchHandler(c echo.Context) error {
 	c.JSON(http.StatusOK, repositories)
 
 	return nil
+}
+
+func (s SearchHandlerRequest) validate() error {
+	return validation.ValidateStruct(&s,
+		validation.Field(&s.ID, validation.Required),
+	)
 }

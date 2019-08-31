@@ -51,3 +51,8 @@ func BeforeStart() {
 func AfterStop() {
 	Disconnect()
 }
+
+// GetDatabase return a *mgo.Database an external pkg
+func GetDatabase() *mgo.Database {
+	return database
+}

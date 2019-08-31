@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/labstack/echo"
 )
 
@@ -29,6 +30,13 @@ func CreateRepository(c echo.Context) error {
 	}
 
 	data := reqData.(CreateRepositoryRequest)
+
+	err = data.validate()
+	if err != nil {
+		status, err := HandleErrors(err)
+		c.JSON(status, err)
+		return err
+	}
 
 	respData, err := GetStarredRepositories(data.Username)
 
@@ -62,4 +70,11 @@ func CreateRepository(c echo.Context) error {
 	c.JSON(http.StatusCreated, user)
 
 	return nil
+}
+
+// validate CreateRepositoryRequest
+func (c CreateRepositoryRequest) validate() error {
+	return validation.ValidateStruct(&c,
+		validation.Field(&c.Username, validation.Required),
+	)
 }

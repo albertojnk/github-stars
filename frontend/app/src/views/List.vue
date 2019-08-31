@@ -152,8 +152,11 @@ export default {
       }
     },
     Save() {
-      this.modal = false
+      this.modal = false;
       this.setLoading({ loading: true, loaded: false });
+      if (this.currentTags == null || this.currentTags.length == 0) {
+        this.currentTags = this.currentRepo.tag_suggester
+      }
       this.$http
         .patch(this.APIURL + "/update", {
           username: this.id,
@@ -171,11 +174,8 @@ export default {
           localStorage.setItem("user", JSON.stringify(this.response));
           this.setLoaded({ loading: false, loaded: true });
         })
-        .catch(err => {
-          console.log(err);
-          this.$router.push("/");
-        })
-        .finally(this.$router.push("list"));
+        .catch(this.$router.push("/"))
+        .finally(this.$router.push("/repositories"));
     },
     sendMonitor(event) {
       if (event.key == "Enter") {

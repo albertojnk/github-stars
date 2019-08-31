@@ -19,12 +19,13 @@ func ListRepositories(c echo.Context) error {
 
 	if !ok || len(values[0]) < 1 {
 		log.Println("url parameter 'username' is missing")
-		c.JSON(500, errors.New("url parameter 'username' is missing"))
-		return errors.New("url parameter 'username' is missing")
+		status, err := HandleErrors(errors.New("url parameter 'username' is missing"))
+		c.JSON(status, err)
+		return err
 	}
 
 	// get the user repositories from DB
-	users, err := datasource.ListUserRepositories(values[0])
+	user, err := datasource.ListUserRepositories(values[0])
 	if err != nil {
 		log.Printf("error while accessing DB, err: %s", err)
 		status, err := HandleErrors(err)
@@ -33,7 +34,7 @@ func ListRepositories(c echo.Context) error {
 	}
 
 	// Endoce response into json
-	c.JSON(http.StatusOK, users)
+	c.JSON(http.StatusOK, user)
 
 	return nil
 }

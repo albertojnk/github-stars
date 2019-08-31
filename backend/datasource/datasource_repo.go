@@ -12,11 +12,8 @@ func CreateUserRepositories(username string, repositories []model.Repository) er
 	db := database
 	user := model.User{}
 
-	err := db.C("users").Find(bson.M{"_id": username}).One(&user)
-	if err != nil {
-		log.Printf("error checking if repository exists, err: %s", err)
-		return err
-	}
+	// checks if repository exsists
+	db.C("users").Find(bson.M{"_id": username}).One(&user)
 
 	updateRepos := []model.Repository{}
 	repoMap := make(map[int]model.Repository, 0)
@@ -40,7 +37,7 @@ func CreateUserRepositories(username string, repositories []model.Repository) er
 		updateRepos = append(updateRepos, repo)
 	}
 
-	_, err = db.C("users").Upsert(
+	_, err := db.C("users").Upsert(
 		bson.M{"_id": username},
 		bson.M{
 			"$set": bson.M{"repositories": updateRepos},
@@ -100,7 +97,7 @@ func UpdateUserRepositoryTags(username string, repositoryID int, tags []string) 
 }
 
 // DeleteUserRepositoryTags delete all tags of a specific repository and return the new values
-func DeleteUserRepositoryTags(username string, repoID int) (model.User, error) {
+func DeleteUserRepositoryTags(username string, repoID int, tags []string) (model.User, error) {
 	db := database
 
 	user := model.User{}
@@ -108,7 +105,7 @@ func DeleteUserRepositoryTags(username string, repoID int) (model.User, error) {
 	_, err := db.C("users").Upsert(
 		bson.M{"_id": username, "repositories.id": repoID},
 		bson.M{
-			"$set": bson.M{"repositories.$.tags": []string{}},
+			"$pullAll": bson.M{"repositories.$.tags": tags},
 		},
 	)
 	if err != nil {

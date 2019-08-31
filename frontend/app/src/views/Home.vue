@@ -61,11 +61,8 @@ export default {
           this.setNewUser(this.response);
           this.setLoaded({ loading: false, loaded: true });
         })
-        .catch(err => {
-          console.log(err);
-          this.$router.push("/");
-        })
-        .finally(this.$router.push("list"));
+        .catch(this.$router.push("/"))
+        .finally(this.$router.push("/repositories"));
     }
   }
 };
