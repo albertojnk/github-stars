@@ -1,95 +1,53 @@
 # golang-crud-spa
 
+[![Build Status](https://travis-ci.com/albertojnk/golang-crud-spa.svg?branch=master)](https://travis-ci.com/albertojnk/golang-crud-spa)
 
-If you don't have Docker/Docker-Compose check **Setup** section below
+##
 
+If you don't have Docker/Docker-Compose check **Setup Docker** section
 
 <details>
-<summary><b>Setup</b></summary>
+<summary><b>Setup Docker</b></summary>
 <p>
 
-## Install Docker
+## Docker
+macOS: <a href="https://docs.docker.com/docker-for-mac/install/"> https://docs.docker.com/docker-for-mac/install/ </a>
 
-###### Uninstall old versions
+linux: <a href="https://docs.docker.com/install/linux/docker-ce/ubuntu/"> https://docs.docker.com/install/linux/docker-ce/ubuntu/ </a>
 
-```
-$ sudo apt-get remove docker docker-engine docker.io containerd runc
-```
 
-###### Set up the repository
 
-```
-$ sudo apt-get update
 
-$ sudo apt-get install \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg-agent \
-    software-properties-common
+## Docker Compose
 
-$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-
-$ sudo add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
-```
-
-###### Install Docker Engine - Community
-
-```
-$ sudo apt-get update
-
-$ sudo apt-get install docker-ce docker-ce-cli containerd.io
-
-$ sudo apt-get install docker-ce=<VERSION_STRING> docker-ce-cli=<VERSION_STRING> containerd.io
-
-$ sudo docker run hello-world
-```
-
-## Install Docker Compose 
-
-```
-$ sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-$ sudo chmod +x /usr/local/bin/docker-compose
-
-$ sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-```
-
+linux: <a href="https://docs.docker.com/compose/install/"> https://docs.docker.com/compose/install/ </a>
 </p>
 </details>
 
-## Running the application
+## Setup application & Run it
 
-Run the application is very simple:
+As we are using golang with go modules, it's recommended to clone this repository outside your $GOPATH, so:
 
 * check your $GOPATH
 
 ```
-$ echo $GOPATH
+    $ echo $GOPATH
 ```
 
-* clone this repository to any directory outside $GOPATH
+* clone repository to any directory outside $GOPATH
 
 ```
-$ git clone https://github.com/albertojnk/golang-crud-spa.git
-```
- or
-
-```
-$ git clone git@github.com:albertojnk/golang-crud-spa.git
+    $ git clone https://github.com/albertojnk/golang-crud-spa.git
 ```
 
 * cd to the repository:
 
 ```
-$ cd golang-crud-spa
+    $ cd your-chosen-path/golang-crud-spa
 ```
 
 * run docker-compose:
 
 ```
-$ docker-compose up
+    $ docker-compose up
 ```
