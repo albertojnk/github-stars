@@ -46,8 +46,35 @@ As we are using golang with go modules, it's recommended to clone this repositor
     $ cd your-chosen-path/golang-crud-spa
 ```
 
+### before you run compose
+
+As docker compose creates/uses a `.data` folder in the root of the directory and because of that, sometimes when running compose it throws an permission error. To avoid this the best you can do is creating giving `.data` folder permissions:
+
+```
+    $ sudo mkdir .data
+    $ sudo chmod 777 -R .data
+```
+
+If you are still getting permissions error try deleting the folder:
+
+```
+    $ sudo rm -rf .data
+```
+
+### Run 
+
 * run docker-compose:
 
 ```
     $ docker-compose up
 ```
+
+* go to your browser and type:
+
+```
+    http://localhost:8090
+```
+
+#
+
+Have fun tagging your starred repositories :D
