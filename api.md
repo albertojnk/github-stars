@@ -3,8 +3,7 @@ FORMAT: 1A
 # golang-crud-spa API
 [GitHub's golang-crud-spa](https://github.com/albertojnk/golang-crud-spa).
 
-## Media Types
-Requests with a message-body are using plain JSON to set or update resource states.
+NOTE: This document is a **work in progress**.
 
 ## Error States
 The common [HTTP Response Status Codes](https://github.com/for-GET/know-your-http-well/blob/master/status-codes.md) are used.
@@ -44,18 +43,97 @@ This resource does not have any attributes.
                 <div id=app></div>
                 <script src=/js/chunk-vendors.f4725632.js> </script> <script src=/js/app.c62866fe.js> </script> </body> </html>
 
-## User/Repositories [/list?username={_id}]
-Multiples github starred repositories objects of an single user. The List resource is the central resource in the golang-crud-spa. It represents one github user and all his starred github public repositories.
+### Create an User and his repositories [POST][/create]
+To create an User send a JSON with his github username.
 
-The List resource has the following attributes:
++ Request (application/json)
 
-+ _id
+        {
+            "username": "albertojnk"
+        }
 
++ Response 201
+    
+    + Headers
 
-+ Parameters
-    + _id (string) - ID of the github user.
+            Content-Type: application/json
 
-+ Model (application/json)
+    + Body 
+
+        {
+            "_id": "albertojnk",
+            "repositories": [
+                {
+                    "id": 203700322,
+                    "name": "golang-crud-spa",
+                    "description": "A simple CRUD in a SPA",
+                    "html_url": "https://github.com/albertojnk/golang-crud-spa",
+                    "language": "Go",
+                    "tags": [],
+                    "tag_suggester": "Go"
+                }
+            ]
+        }
+
+### List repositories [GET][/list]
++ Response 200
+
+    + Headers
+
+            Content-Type: application/json
+
+    + Body 
+
+            {
+                "_id": "test_user1",
+                "repositories": [
+                    {
+                        "id": 1,
+                        "name": "test_name1",
+                        "description": "test repository tags deletion 1",
+                        "html_url": "http://google.com",
+                        "language": "Gotest",
+                        "tags": [
+                            "Test1",
+                            "Test2",
+                            "Test3"
+                        ],
+                        "tag_suggester": "Gotest"
+                    }
+                ]
+            }
+
+# Group Tags
+Tags-related resources of **golang-crud-spa**
+
+## Repository & TAGS
+Update overwrite the tags of a given repository ID. Repository is the central resource of **golang-crud-spa**. It represents a starred github repository of a given user.
+
+The Repository resource has the following attributes:
+
++ id
++ name
++ description
++ html_url
++ language
++ tags
++ tag_suggester
+
+### Update repository tags [PATCH][/update]
+
++ Request 
+
+    + Headers
+
+            Content-Type: application/json
+    
+    + Body
+
+            "username": "test_user1",
+            "repo_id": 1,
+            "tags": ["Test1", "Test2", "Test3", "Teste4", "Teste5"]
+
++ Response 200
 
     + Headers
 
@@ -63,141 +141,62 @@ The List resource has the following attributes:
 
     + Body
 
-            "_id": "test_user1",
-            "repositories": [
+            [
                 {
-                    "id": 1,
-                    "name": "test_name1",
-                    "description": "test repository tags deletion 1",
-                    "html_url": "http://google.com",
-                    "language": "Gotest",
+                    "id": 203700322,
+                    "name": "golang-crud-spa",
+                    "description": "A simple CRUD in a SPA",
+                    "html_url": "https://github.com/albertojnk/golang-crud-spa",
+                    "language": "Go",
                     "tags": [
                         "Test1",
                         "Test2",
-                        "Test3"
+                        "Test3",
+                        "Teste4",
+                        "Teste5"
                     ],
-                    "tag_suggester": "Gotest"
+                    "tag_suggester": "Go"
                 }
             ]
-<!-- 
-### Retrieve a Single Gist [GET]
-+ Response 200
 
-    [Gist][]
+### Delete tags [DELETE][/delete]
++ Request
+    
+    + Headers
 
-### Edit a Gist [PATCH]
-To update a Gist send a JSON with updated value for one or more of the Gist resource attributes. All attributes values (states) from the previous version of this Gist are carried over by default if not included in the hash.
+            Content-Type: application/json
 
-+ Request (application/json)
+    + Body
 
         {
-            "content": "Updated file contents"
+            "username": "albertojnk",
+            "repo_id": 203700322,
+            "tags": ["Test1", "Test3"]
         }
 
-+ Response 200
-
-    [Gist][]
-
-### Delete a Gist [DELETE]
-+ Response 204
-
-## Gists Collection [/gists{?since}]
-Collection of all Gists.
-
-The Gist Collection resource has the following attribute:
-
-+ total
-
-In addition it **embeds** *Gist Resources* in the golang-crud-spa.
-
-
-+ Model (application/hal+json)
-
-    HAL+JSON representation of Gist Collection Resource. The Gist resources in collections are embedded. Note the embedded Gists resource are incomplete representations of the Gist in question. Use the respective Gist link to retrieve its full representation.
++ Response 
 
     + Headers
 
-            Link: <http:/api.gistfox.com/gists>;rel="self"
+            Content-Type: application/json
 
     + Body
 
             {
-                "_links": {
-                    "self": { "href": "/gists" }
-                },
-                "_embedded": {
-                    "gists": [
-                        {
-                            "_links" : {
-                                "self": { "href": "/gists/42" }
-                            },
-                            "id": "42",
-                            "created_at": "2014-04-14T02:15:15Z",
-                            "description": "Description of Gist"
-                        }
-                    ]
-                },
-                "total": 1
+                "_id": "albertojnk",
+                "repositories": [
+                    {
+                        "id": 203700322,
+                        "name": "golang-crud-spa",
+                        "description": "A simple CRUD in a SPA",
+                        "html_url": "https://github.com/albertojnk/golang-crud-spa",
+                        "language": "Go",
+                        "tags": [
+                            "Test2",
+                            "Teste4",
+                            "Teste5"
+                        ],
+                        "tag_suggester": "Go"
+                    }
+                ]
             }
-
-### List All Gists [GET]
-+ Parameters
-    + since (string, optional) - Timestamp in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ` Only gists updated at or after this time are returned.
-
-+ Response 200
-
-    [Gists Collection][]
-
-### Create a Gist [POST]
-To create a new Gist simply provide a JSON hash of the *description* and *content* attributes for the new Gist.
-
-+ Request (application/json)
-
-        {
-            "description": "Description of Gist",
-            "content": "String content"
-        }
-
-+ Response 201
-
-    [Gist][]
-
-## Star [/gists/{id}/star]
-Star resource represents a Gist starred status.
-
-The Star resource has the following attribute:
-
-+ starred
-
-
-+ Parameters
-
-    + id (string) - ID of the gist in the form of a hash
-
-+ Model (application/hal+json)
-
-    HAL+JSON representation of Star Resource.
-
-    + Headers
-
-            Link: <http:/api.gistfox.com/gists/42/star>;rel="self"
-
-    + Body
-
-            {
-                "_links": {
-                    "self": { "href": "/gists/42/star" }
-                },
-                "starred": true
-            }
-
-### Star a Gist [PUT]
-+ Response 204
-
-### Unstar a Gist [DELETE]
-+ Response 204
-
-### Check if a Gist is Starred [GET]
-+ Response 200
-
-    [Star][] -->
