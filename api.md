@@ -60,20 +60,20 @@ To create an User send a JSON with his github username.
 
     + Body 
 
-        {
-            "_id": "albertojnk",
-            "repositories": [
-                {
-                    "id": 203700322,
-                    "name": "golang-crud-spa",
-                    "description": "A simple CRUD in a SPA",
-                    "html_url": "https://github.com/albertojnk/golang-crud-spa",
-                    "language": "Go",
-                    "tags": [],
-                    "tag_suggester": "Go"
-                }
-            ]
-        }
+            {
+                "_id": "albertojnk",
+                "repositories": [
+                    {
+                        "id": 203700322,
+                        "name": "golang-crud-spa",
+                        "description": "A simple CRUD in a SPA",
+                        "html_url": "https://github.com/albertojnk/golang-crud-spa",
+                        "language": "Go",
+                        "tags": [],
+                        "tag_suggester": "Go"
+                    }
+                ]
+            }
 
 ### List repositories [GET][/list]
 + Response 200
