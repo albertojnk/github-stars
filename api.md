@@ -129,9 +129,11 @@ The Repository resource has the following attributes:
     
     + Body
 
-            "username": "test_user1",
-            "repo_id": 1,
-            "tags": ["Test1", "Test2", "Test3", "Teste4", "Teste5"]
+            {
+                "username": "test_user1",
+                "repo_id": 1,
+                "tags": ["Test1", "Test2", "Test3", "Teste4", "Teste5"]
+            }
 
 + Response 200
 
@@ -168,11 +170,11 @@ The Repository resource has the following attributes:
 
     + Body
 
-        {
-            "username": "albertojnk",
-            "repo_id": 203700322,
-            "tags": ["Test1", "Test3"]
-        }
+            {
+                "username": "albertojnk",
+                "repo_id": 203700322,
+                "tags": ["Test1", "Test3"]
+            }
 
 + Response 
 
