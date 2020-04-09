@@ -1,8 +1,8 @@
 package main
 
 import (
-	"golang-crud-spa/backend/datasource"
-	"golang-crud-spa/backend/endpoint"
+	"github-stars/backend/datasource"
+	"github-stars/backend/endpoint"
 	"log"
 	"net/http"
 

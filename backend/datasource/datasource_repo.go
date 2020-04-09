@@ -1,7 +1,7 @@
 package datasource
 
 import (
-	"golang-crud-spa/backend/model"
+	"github-stars/backend/model"
 	"log"
 
 	"github.com/globalsign/mgo/bson"

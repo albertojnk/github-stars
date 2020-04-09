@@ -14,7 +14,7 @@ services:
   - elasticsearch
 
 install: 
-  - go mod init golang-crud-spa
+  - go mod init github-stars
 
 script:
   - go build

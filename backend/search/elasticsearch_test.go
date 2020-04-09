@@ -2,8 +2,8 @@ package search_test
 
 import (
 	"context"
-	"golang-crud-spa/backend/model"
-	"golang-crud-spa/backend/search"
+	"github-stars/backend/model"
+	"github-stars/backend/search"
 	"strings"
 	"testing"
 

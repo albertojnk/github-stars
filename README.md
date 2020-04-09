@@ -1,6 +1,6 @@
-# golang-crud-spa
+# github-stars
 
-[![Build Status](https://travis-ci.com/albertojnk/golang-crud-spa.svg?branch=master)](https://travis-ci.com/albertojnk/golang-crud-spa)
+[![Build Status](https://travis-ci.com/albertojnk/github-stars.svg?branch=master)](https://travis-ci.com/albertojnk/github-stars)
 
 ##
 
@@ -37,13 +37,13 @@ As we are using golang with go modules, it's recommended to clone this repositor
 * clone repository to any directory outside $GOPATH
 
 ```
-    $ git clone https://github.com/albertojnk/golang-crud-spa.git
+    $ git clone https://github.com/albertojnk/github-stars.git
 ```
 
 * cd to the repository:
 
 ```
-    $ cd your-chosen-path/golang-crud-spa
+    $ cd your-chosen-path/github-stars
 ```
 
 ### before you run compose

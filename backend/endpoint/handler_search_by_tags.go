@@ -1,9 +1,9 @@
 package endpoint
 
 import (
-	"golang-crud-spa/backend/datasource"
-	"golang-crud-spa/backend/model"
-	"golang-crud-spa/backend/search"
+	"github-stars/backend/datasource"
+	"github-stars/backend/model"
+	"github-stars/backend/search"
 	"log"
 	"net/http"
 

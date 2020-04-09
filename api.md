@@ -1,15 +1,15 @@
 FORMAT: 1A
 
-# golang-crud-spa API
-[GitHub's golang-crud-spa](https://github.com/albertojnk/golang-crud-spa).
+# github-stars API
+[GitHub's github-stars](https://github.com/albertojnk/github-stars).
 
 NOTE: This document is a **work in progress**.
 
 ## Error States
 The common [HTTP Response Status Codes](https://github.com/for-GET/know-your-http-well/blob/master/status-codes.md) are used.
 
-# golang-crud-spa Root [/]
-golang-crud-spa entry point.
+# github-stars Root [/]
+github-stars entry point.
 
 This resource does not have any attributes.
 
@@ -65,9 +65,9 @@ To create an User send a JSON with his github username.
                 "repositories": [
                     {
                         "id": 203700322,
-                        "name": "golang-crud-spa",
+                        "name": "github-stars",
                         "description": "A simple CRUD in a SPA",
-                        "html_url": "https://github.com/albertojnk/golang-crud-spa",
+                        "html_url": "https://github.com/albertojnk/github-stars",
                         "language": "Go",
                         "tags": [],
                         "tag_suggester": "Go"
@@ -104,10 +104,10 @@ To create an User send a JSON with his github username.
             }
 
 # Group Tags
-Tags-related resources of **golang-crud-spa**
+Tags-related resources of **github-stars**
 
 ## Repository & TAGS
-Update overwrite the tags of a given repository ID. Repository is the central resource of **golang-crud-spa**. It represents a starred github repository of a given user.
+Update overwrite the tags of a given repository ID. Repository is the central resource of **github-stars**. It represents a starred github repository of a given user.
 
 The Repository resource has the following attributes:
 
@@ -146,9 +146,9 @@ The Repository resource has the following attributes:
             [
                 {
                     "id": 203700322,
-                    "name": "golang-crud-spa",
+                    "name": "github-stars",
                     "description": "A simple CRUD in a SPA",
-                    "html_url": "https://github.com/albertojnk/golang-crud-spa",
+                    "html_url": "https://github.com/albertojnk/github-stars",
                     "language": "Go",
                     "tags": [
                         "Test1",
@@ -189,9 +189,9 @@ The Repository resource has the following attributes:
                 "repositories": [
                     {
                         "id": 203700322,
-                        "name": "golang-crud-spa",
+                        "name": "github-stars",
                         "description": "A simple CRUD in a SPA",
-                        "html_url": "https://github.com/albertojnk/golang-crud-spa",
+                        "html_url": "https://github.com/albertojnk/github-stars",
                         "language": "Go",
                         "tags": [
                             "Test2",

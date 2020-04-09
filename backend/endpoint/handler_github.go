@@ -3,7 +3,7 @@ package endpoint
 import (
 	"encoding/json"
 	"fmt"
-	"golang-crud-spa/backend/model"
+	"github-stars/backend/model"
 	"io/ioutil"
 	"log"
 	"net/http"

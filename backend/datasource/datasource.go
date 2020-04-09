@@ -17,7 +17,7 @@ func Connect() {
 	var err error
 	var s *mgo.Session
 
-	db := "golang-crud-spa"
+	db := "github-stars"
 	uri := os.Getenv("MONGO_URI")
 
 	log.Println("Starting connection with MongoDB...")

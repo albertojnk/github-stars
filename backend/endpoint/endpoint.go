@@ -2,7 +2,7 @@ package endpoint
 
 import (
 	"encoding/json"
-	"golang-crud-spa/backend/model"
+	"github-stars/backend/model"
 	"io"
 	"io/ioutil"
 	"log"

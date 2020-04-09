@@ -2,7 +2,7 @@ package endpoint
 
 import (
 	"errors"
-	"golang-crud-spa/backend/datasource"
+	"github-stars/backend/datasource"
 	"log"
 	"net/http"
 

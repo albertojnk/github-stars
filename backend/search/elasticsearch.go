@@ -2,7 +2,7 @@ package search
 
 import (
 	"context"
-	"golang-crud-spa/backend/model"
+	"github-stars/backend/model"
 	"log"
 	"os"
 	"reflect"
